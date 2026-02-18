@@ -1,0 +1,236 @@
+﻿<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Acceso para proveedores | NOVA BODA</title>
+    <meta
+      name="description"
+      content="Accede o crea tu cuenta de proveedor en NOVA BODA para recibir solicitudes y gestionar tu perfil."
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href="https://novaboda.com/vendors-auth.html" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="logo" href="index.html">
+          <img
+            class="logo-image"
+            src="assets/Nova Design 2000 transparente.png"
+            alt="NOVA BODA"
+          />
+        </a>
+        <div class="nav-right">
+          <nav class="nav-links">
+            <a href="services.html">Servicios</a>
+            <a href="proveedores-boda-valencia.html">Proveedores</a>
+            <a href="planes.html">Planes</a>
+            <a href="contact.html">Contacto</a>
+          </nav>
+          <a class="btn primary nav-login" href="vendors-auth.html">Iniciar sesión</a>
+        </div>
+        <button class="nav-toggle" aria-label="Alternar navegación">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="section auth-section">
+        <div class="container auth-container">
+          <div class="auth-copy">
+            <span class="section-label">Área de proveedores</span>
+            <h1>Accede a tu cuenta de proveedor</h1>
+            <p class="lead">
+              Gestiona tu perfil, responde solicitudes y recibe nuevas parejas
+              interesadas en tus servicios.
+            </p>
+            <ul class="auth-highlights">
+              <li>Solicitudes directas de parejas</li>
+              <li>Perfil editable y actualizado</li>
+              <li>Control de disponibilidad</li>
+            </ul>
+          </div>
+          <div class="auth-card">
+            <div class="auth-toggle" role="tablist" aria-label="Acceso proveedores">
+              <button
+                class="auth-tab is-active"
+                type="button"
+                data-auth-tab="login"
+                aria-selected="true"
+              >
+                Iniciar sesión
+              </button>
+              <button
+                class="auth-tab"
+                type="button"
+                data-auth-tab="signup"
+                aria-selected="false"
+              >
+                Crear cuenta
+              </button>
+            </div>
+
+            <form class="auth-form is-active" data-auth-panel="login" id="vendorLoginForm">
+              <label>
+                Email de proveedor
+                <input
+                  type="email"
+                  name="login-email"
+                  placeholder="tu@email.com"
+                  autocomplete="email"
+                  required
+                />
+              </label>
+              <label>
+                Contraseña
+                <input
+                  type="password"
+                  name="login-password"
+                  placeholder="Tu contraseña"
+                  autocomplete="current-password"
+                  required
+                />
+              </label>
+              <button class="btn primary" type="submit">Entrar</button>
+              <p class="auth-helper form-error" data-auth-error hidden></p>
+              <p class="auth-helper">
+                ¿No tienes cuenta?
+                <button type="button" class="auth-link" data-auth-switch="signup">
+                  Crear cuenta
+                </button>
+              </p>
+            </form>
+
+            <form class="auth-form" data-auth-panel="signup" id="vendorSignupForm">
+              <label>
+                Nombre comercial
+                <input
+                  type="text"
+                  name="signup-name"
+                  placeholder="Tu marca"
+                  autocomplete="organization"
+                  required
+                />
+              </label>
+              <label>
+                Email de contacto
+                <input
+                  type="email"
+                  name="signup-email"
+                  placeholder="proveedor@email.com"
+                  autocomplete="email"
+                  required
+                />
+              </label>
+              <label>
+                Teléfono
+                <input
+                  type="tel"
+                  name="signup-phone"
+                  placeholder="+34 600 000 000"
+                  autocomplete="tel"
+                  required
+                />
+              </label>
+              <label>
+                Contraseña
+                <input
+                  type="password"
+                  name="signup-password"
+                  placeholder="Crea una contraseña"
+                  autocomplete="new-password"
+                  required
+                />
+              </label>
+              <label>
+                Confirmar contraseña
+                <input
+                  type="password"
+                  name="signup-confirm-password"
+                  placeholder="Repite tu contraseña"
+                  autocomplete="new-password"
+                  required
+                />
+              </label>
+              <button class="btn primary" type="submit">Crear cuenta</button>
+              <p class="auth-helper form-error" data-auth-error hidden></p>
+              <p class="auth-helper">
+                ¿Ya tienes cuenta?
+                <button type="button" class="auth-link" data-auth-switch="login">
+                  Iniciar sesión
+                </button>
+              </p>
+            </form>
+          </div>
+        </div>
+      </section>
+      <section id="contact" class="section cta">
+        <div class="container cta-content">
+          <div>
+            <h2>¿Lista para comenzar?</h2>
+            <p>
+              Cuéntanos algunos detalles y te enviamos una propuesta en menos
+              de 48 horas.
+            </p>
+          </div>
+          <form class="cta-form">
+            <label>
+              Nombre
+              <input type="text" name="name" placeholder="Tu nombre" required />
+            </label>
+            <label>
+              Correo
+              <input
+                type="email"
+                name="email"
+                placeholder="tu@correo.com"
+                required
+              />
+            </label>
+            <label>
+              Detalles
+              <textarea
+                name="details"
+                rows="3"
+                placeholder="Cuéntanos sobre tu boda"
+              ></textarea>
+            </label>
+            <button class="btn primary" type="submit">Enviar solicitud</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-content">
+        <div>
+          <img
+            class="logo-image footer-logo"
+            src="assets/Nova Design 2000 transparente white font footer.png"
+            alt="NOVA BODA"
+          />
+          <p>Herramientas claras para un día inolvidable.</p>
+          <small>© 2026 NOVA BODA. Todos los derechos reservados.</small>
+        </div>
+        <div class="footer-links">
+          <a href="proveedores-boda-valencia.html">Proveedores</a>
+          <a href="proveedores-boda-valencia/fotografos-boda-valencia.html">Fotógrafos</a>
+          <a href="proveedores-boda-valencia/fincas-boda-valencia.html">Fincas</a>
+          <a href="proveedores-boda-valencia/catering-boda-valencia.html">Catering</a>
+          <a href="proveedores-boda-valencia/dj-boda-valencia.html">DJs</a>
+          <a href="proveedores-boda-valencia/decoracion-boda-valencia.html">Decoración</a>
+          <a href="planes.html">Planes</a>
+          <a href="contact.html">Contacto</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
+

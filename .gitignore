@@ -1,0 +1,17 @@
+# OS / editor junk
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Vercel / Netlify / Cloudflare
+.vercel
+.netlify
+.wrangler
+
+# Local env / secrets
+.env
+.env.*
+
+# Logs
+*.log
+

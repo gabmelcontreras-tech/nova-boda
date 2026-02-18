@@ -1,0 +1,331 @@
+﻿<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Panel de proveedor | NOVA BODA</title>
+    <meta
+      name="description"
+      content="Accede a tu panel de proveedor para revisar y actualizar tu perfil."
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href="https://novaboda.com/vendor-dashboard.html" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="logo" href="index.html">
+          <img
+            class="logo-image"
+            src="assets/Nova Design 2000 transparente.png"
+            alt="NOVA BODA"
+          />
+        </a>
+        <div class="nav-right">
+          <nav class="nav-links">
+            <a href="services.html">Servicios</a>
+            <a href="proveedores-boda-valencia.html">Proveedores</a>
+            <a href="planes.html">Planes</a>
+            <a href="contact.html">Contacto</a>
+          </nav>
+          <a class="btn primary nav-login" href="vendors-auth.html">Iniciar sesión</a>
+        </div>
+        <button class="nav-toggle" aria-label="Alternar navegación">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="section vendor-dashboard">
+        <div class="container">
+          <div class="section-head">
+            <p class="section-label">Área de proveedores</p>
+            <h1>Panel de proveedor</h1>
+            <p class="lead">
+              Revisa tu perfil público y actualiza la información que ven las parejas.
+            </p>
+          </div>
+
+          <div class="grid dashboard-grid">
+            <article class="panel dashboard-card">
+              <h2>Tu cuenta</h2>
+              <p class="muted">
+                Sesión iniciada como: <strong id="vendorSessionEmail">-</strong>
+              </p>
+              <div class="dashboard-actions">
+                <a class="btn ghost" id="vendorPublicProfileLink" href="vendor-profile.html">
+                  Ver perfil público
+                </a>
+                <button class="btn secondary" type="button" id="vendorLogoutBtn">
+                  Cerrar sesión
+                </button>
+              </div>
+              <p class="dashboard-hint muted">
+                Nota: este panel es estático y guarda datos en tu navegador (sin backend).
+              </p>
+            </article>
+
+            <article class="panel dashboard-card">
+              <h2>Tu perfil</h2>
+              <form class="dashboard-form" id="vendorProfileForm">
+                <h3 class="dashboard-subtitle">Información clave</h3>
+                <label>
+                  Nombre comercial
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Ej. Luz & Lente"
+                    autocomplete="organization"
+                    required
+                  />
+                </label>
+                <label>
+                  Categoría
+                  <select name="category" required>
+                    <option value="">Selecciona una categoría</option>
+                    <option value="Alquileres">Alquileres</option>
+                    <option value="Bandas">Bandas</option>
+                    <option value="Bloques de habitaciones">Bloques de habitaciones</option>
+                    <option value="Catering">Catering</option>
+                    <option value="Cenas de ensayo, despedidas y celebraciones">Cenas de ensayo, despedidas y celebraciones</option>
+                    <option value="Clases de baile">Clases de baile</option>
+                    <option value="Decoración">Decoración</option>
+                    <option value="DJs">DJs</option>
+                    <option value="Ensembles y solistas">Ensembles y solistas</option>
+                    <option value="Especialistas en viajes">Especialistas en viajes</option>
+                    <option value="Espacios para recepción">Espacios para recepción</option>
+                    <option value="Fincas">Fincas</option>
+                    <option value="Floristerías">Floristerías</option>
+                    <option value="Fotógrafos">Fotógrafos</option>
+                    <option value="Fotomatones">Fotomatones</option>
+                    <option value="Invitaciones y papelería">Invitaciones y papelería</option>
+                    <option value="Joyería">Joyería</option>
+                    <option value="Maquillaje y peluquería">Maquillaje y peluquería</option>
+                    <option value="Oficiantes y consejería prematrimonial">Oficiantes y consejería prematrimonial</option>
+                    <option value="Pastelería">Pastelería</option>
+                    <option value="Planificadores de boda">Planificadores de boda</option>
+                    <option value="Recuerdos y regalos">Recuerdos y regalos</option>
+                    <option value="Salones de novia">Salones de novia</option>
+                    <option value="Servicios de bar">Servicios de bar</option>
+                    <option value="Transporte">Transporte</option>
+                    <option value="Videógrafos">Videógrafos</option>
+                  </select>
+                </label>
+                <label>
+                  Zona
+                  <input
+                    type="text"
+                    name="location"
+                    placeholder="Ej. Valencia y alrededores"
+                    autocomplete="address-level2"
+                  />
+                </label>
+                <div class="dashboard-row">
+                  <label>
+                    Tiempo de respuesta
+                    <input
+                      type="text"
+                      name="responseTime"
+                      placeholder="Ej. 24-48h"
+                      autocomplete="off"
+                    />
+                  </label>
+                </div>
+                <label>
+                  Descripción corta
+                  <textarea
+                    name="description"
+                    rows="4"
+                    placeholder="Describe tu estilo, enfoque y lo que te diferencia."
+                  ></textarea>
+                </label>
+                <div class="dashboard-row">
+                  <label>
+                    Email de contacto
+                    <input
+                      type="email"
+                      name="contactEmail"
+                      placeholder="proveedor@email.com"
+                      autocomplete="email"
+                    />
+                  </label>
+                  <label>
+                    Teléfono
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="+34 600 000 000"
+                      autocomplete="tel"
+                    />
+                  </label>
+                </div>
+
+                <h3 class="dashboard-subtitle">Precios</h3>
+                <p class="muted dashboard-hint">
+                  Añade 1-2 paquetes para mostrar precios orientativos en tu perfil.
+                </p>
+                <div class="dashboard-row">
+                  <label>
+                    Paquete 1 - Nombre
+                    <input type="text" name="pkg1Name" placeholder="Pack Esencial" />
+                  </label>
+                  <label>
+                    Paquete 1 - Precio (EUR)
+                    <input
+                      type="number"
+                      name="pkg1Price"
+                      min="0"
+                      step="1"
+                      placeholder="950"
+                      inputmode="numeric"
+                    />
+                  </label>
+                </div>
+                <label>
+                  Paquete 1 - Incluye (una línea por punto)
+                  <textarea
+                    name="pkg1Items"
+                    rows="3"
+                    placeholder="Cobertura de ceremonia y retratos&#10;Entrega digital editada&#10;Reunión previa"
+                  ></textarea>
+                </label>
+
+                <div class="dashboard-row">
+                  <label>
+                    Paquete 2 - Nombre
+                    <input type="text" name="pkg2Name" placeholder="Pack Completo" />
+                  </label>
+                  <label>
+                    Paquete 2 - Precio (EUR)
+                    <input
+                      type="number"
+                      name="pkg2Price"
+                      min="0"
+                      step="1"
+                      placeholder="1450"
+                      inputmode="numeric"
+                    />
+                  </label>
+                </div>
+                <label>
+                  Paquete 2 - Incluye (una línea por punto)
+                  <textarea
+                    name="pkg2Items"
+                    rows="3"
+                    placeholder="Cobertura completa del día&#10;Sesión pre o post boda&#10;Galería privada para invitados"
+                  ></textarea>
+                </label>
+
+                <h3 class="dashboard-subtitle">Disponibilidad</h3>
+                <label>
+                  Nota de disponibilidad (se muestra en tu perfil)
+                  <textarea
+                    name="availability"
+                    rows="3"
+                    placeholder="Ej. Fechas más solicitadas: mayo, junio, septiembre y octubre. Recomendamos reservar con 9-12 meses."
+                  ></textarea>
+                </label>
+
+                <div class="dashboard-actions">
+                  <button class="btn primary" type="submit" id="vendorSaveBtn">
+                    Guardar cambios
+                  </button>
+                  <span class="muted" id="vendorSaveStatus" aria-live="polite"></span>
+                </div>
+              </form>
+            </article>
+
+            <article class="panel dashboard-card dashboard-card--full">
+              <h2>Preguntas frecuentes (FAQ)</h2>
+              <p class="muted">
+                Añade preguntas para que aparezcan en tu perfil público.
+              </p>
+              <form class="dashboard-form" id="vendorFaqForm">
+                <div class="dashboard-row">
+                  <label>
+                    Pregunta
+                    <input
+                      type="text"
+                      name="question"
+                      placeholder="Ej. ¿Incluye desplazamiento?"
+                      autocomplete="off"
+                    />
+                  </label>
+                  <label>
+                    Respuesta
+                    <input
+                      type="text"
+                      name="answer"
+                      placeholder="Ej. Sí, dentro de Valencia ciudad..."
+                      autocomplete="off"
+                    />
+                  </label>
+                </div>
+                <div class="dashboard-actions">
+                  <button class="btn ghost" type="submit">Añadir FAQ</button>
+                  <span class="muted" id="vendorFaqStatus" aria-live="polite"></span>
+                </div>
+              </form>
+              <div class="faq-admin">
+                <div class="faq-admin-head">
+                  <strong>FAQs actuales</strong>
+                  <span class="muted" id="vendorFaqCount">0</span>
+                </div>
+                <ul class="faq-admin-list" id="vendorFaqList" aria-label="Lista de FAQs"></ul>
+              </div>
+            </article>
+
+            <article class="panel dashboard-card dashboard-card--full">
+              <h2>Fotos del perfil</h2>
+              <p class="muted">
+                Próximamente podrás subir tus fotos (logo, portada y galería) para que
+                aparezcan en tu perfil público.
+              </p>
+              <div class="upload-placeholder" aria-label="Subida de fotos (próximamente)">
+                <div class="upload-icon" aria-hidden="true">⬆</div>
+                <div class="upload-copy">
+                  <strong>Arrastra y suelta imágenes aquí</strong>
+                  <span class="muted">o selecciona archivos desde tu dispositivo</span>
+                </div>
+                <button class="btn ghost" type="button" disabled>
+                  Seleccionar imágenes
+                </button>
+              </div>
+              <p class="dashboard-hint muted">
+                Por ahora, tu perfil público usa imágenes placeholder. Cuando activemos esta
+                función, podrás gestionar tu galería desde aquí.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-content">
+        <div>
+          <img
+            class="logo-image footer-logo"
+            src="assets/Nova Design 2000 transparente white font footer.png"
+            alt="NOVA BODA"
+          />
+          <p>Herramientas claras para un día inolvidable.</p>
+          <small>© 2026 NOVA BODA. Todos los derechos reservados.</small>
+        </div>
+        <div class="footer-links">
+          <a href="proveedores-boda-valencia.html">Proveedores</a>
+          <a href="planes.html">Planes</a>
+          <a href="contact.html">Contacto</a>
+          <a href="privacy-policy.html">Privacidad</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
+
