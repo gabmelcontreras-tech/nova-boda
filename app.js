@@ -97,10 +97,23 @@ const tabs=qa("[data-auth-tab]"),panels=qa("[data-auth-panel]"),showTab=target=>
 tabs.forEach(t=>t.addEventListener("click",()=>t.dataset.authTab&&showTab(t.dataset.authTab)));
 qa("[data-auth-switch]").forEach(b=>b.addEventListener("click",()=>b.dataset.authSwitch&&showTab(b.dataset.authSwitch)));
 
+const forgotBtn=q("#vendorForgotPasswordBtn"),forgotStatus=q("#vendorForgotPasswordStatus"),resetForm=q("#vendorResetPasswordForm"),resetStatus=q("#vendorResetPasswordStatus");
+const inRecoveryMode=location.search.includes("mode=reset")||location.hash.includes("type=recovery")||location.hash.includes("access_token");
+if(inRecoveryMode&&resetForm){resetForm.hidden=false;showTab("login");}
+if(sb&&resetForm){sb.auth.onAuthStateChange((event)=>{if(event==="PASSWORD_RECOVERY"){resetForm.hidden=false;showTab("login");}});}
+
 const login=q("#vendorLoginForm");
 if(login)(async()=>{
   const ex=await active();if(ex?.email&&!location.search.includes("force=1")){location.href="vendor-dashboard.html";return;}
   const email=q('input[name="login-email"]',login),pass=q('input[name="login-password"]',login),err=q("[data-auth-error]",login);
+  forgotBtn?.addEventListener("click",async()=>{if(forgotStatus)forgotStatus.textContent="";
+    const em=email?.value?.trim()||"";if(!em){if(forgotStatus)forgotStatus.textContent="Escribe tu email y vuelve a pulsar.";email?.focus();return;}
+    if(!sb){if(forgotStatus)forgotStatus.textContent="Recuperacion disponible solo con Supabase activo.";return;}
+    const redirectTo=`${location.origin}/vendors-auth.html?mode=reset`;
+    const r=await sb.auth.resetPasswordForEmail(em,{redirectTo});
+    if(r.error){if(forgotStatus)forgotStatus.textContent=r.error.message||"No se pudo enviar el email de recuperacion.";return;}
+    if(forgotStatus)forgotStatus.textContent="Te enviamos un email para restablecer la contrasena.";
+  });
   login.addEventListener("submit",async e=>{e.preventDefault();if(err){err.hidden=true;err.textContent="";}const em=email?.value?.trim()||"",pw=pass?.value||"";
     if(!em){if(err){err.textContent="Introduce tu email para continuar.";err.hidden=false;}email?.focus();return;}
     if(sb){if(!pw){if(err){err.textContent="Introduce tu contrasena.";err.hidden=false;}pass?.focus();return;}
@@ -110,6 +123,24 @@ if(login)(async()=>{
     location.href="vendor-dashboard.html";
   });
 })();
+
+if(resetForm){
+  const p=q('input[name="reset-password"]',resetForm),p2=q('input[name="reset-confirm-password"]',resetForm);
+  resetForm.addEventListener("submit",async e=>{e.preventDefault();if(resetStatus)resetStatus.textContent="";
+    const a=p?.value||"",b=p2?.value||"";
+    if(!a||!b){if(resetStatus)resetStatus.textContent="Completa ambos campos.";return;}
+    if(a!==b){if(resetStatus)resetStatus.textContent="Las contrasenas no coinciden.";return;}
+    if(a.length<8){if(resetStatus)resetStatus.textContent="Usa al menos 8 caracteres.";return;}
+    if(!sb){if(resetStatus)resetStatus.textContent="Supabase no esta configurado.";return;}
+    const sess=await sbSession();
+    if(!sess){if(resetStatus)resetStatus.textContent="Abre el enlace de recuperacion desde tu email.";return;}
+    const r=await sb.auth.updateUser({password:a});
+    if(r.error){if(resetStatus)resetStatus.textContent=r.error.message||"No se pudo actualizar la contrasena.";return;}
+    if(resetStatus)resetStatus.textContent="Contrasena actualizada. Ya puedes iniciar sesion.";
+    resetForm.reset();
+    if(location.hash){history.replaceState({},document.title,location.pathname+location.search);}
+  });
+}
 
 const signup=q("#vendorSignupForm");
 if(signup){

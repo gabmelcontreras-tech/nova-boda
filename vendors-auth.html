@@ -99,11 +99,44 @@
               <button class="btn primary" type="submit">Entrar</button>
               <p class="auth-helper form-error" data-auth-error hidden></p>
               <p class="auth-helper">
+                <button type="button" class="auth-link" id="vendorForgotPasswordBtn">
+                  He olvidado mi contraseña
+                </button>
+              </p>
+              <p class="auth-helper" id="vendorForgotPasswordStatus" aria-live="polite"></p>
+              <p class="auth-helper">
                 ¿No tienes cuenta?
                 <button type="button" class="auth-link" data-auth-switch="signup">
                   Crear cuenta
                 </button>
               </p>
+            </form>
+
+            <form class="auth-form" id="vendorResetPasswordForm" hidden>
+              <label>
+                Nueva contraseña
+                <input
+                  type="password"
+                  name="reset-password"
+                  placeholder="Nueva contraseña"
+                  autocomplete="new-password"
+                  minlength="8"
+                  required
+                />
+              </label>
+              <label>
+                Confirmar nueva contraseña
+                <input
+                  type="password"
+                  name="reset-confirm-password"
+                  placeholder="Repite la nueva contraseña"
+                  autocomplete="new-password"
+                  minlength="8"
+                  required
+                />
+              </label>
+              <button class="btn primary" type="submit">Guardar nueva contraseña</button>
+              <p class="auth-helper" id="vendorResetPasswordStatus" aria-live="polite"></p>
             </form>
 
             <form class="auth-form" data-auth-panel="signup" id="vendorSignupForm">
