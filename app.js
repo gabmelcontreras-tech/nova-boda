@@ -1,663 +1,172 @@
-const toggleButton = document.querySelector(".nav-toggle");
-const navLinks = document.querySelector(".nav-links");
+const q=(s,r=document)=>r.querySelector(s),qa=(s,r=document)=>[...r.querySelectorAll(s)];
+const t=q(".nav-toggle"),n=q(".nav-links");
+t?.addEventListener("click",()=>{n?.classList.toggle("open");if(t&&n)t.setAttribute("aria-expanded",String(n.classList.contains("open")));});
+qa(".nav-links a").forEach(a=>a.addEventListener("click",()=>{n?.classList.remove("open");t?.setAttribute("aria-expanded","false");}));
+if(t)t.setAttribute("aria-expanded","false");
 
-toggleButton?.addEventListener("click", () => {
-  navLinks?.classList.toggle("open");
-  if (toggleButton && navLinks) {
-    const isOpen = navLinks.classList.contains("open");
-    toggleButton.setAttribute("aria-expanded", String(isOpen));
-  }
+const SESS="nova_vendor_session_v1",PROF="nova_vendor_profiles_v1";
+const isSub=location.pathname.includes("/proveedores-boda-valencia/");
+const parse=v=>{try{return JSON.parse(v);}catch{return null;}};
+const cfg=window.NovaBodaSupabase||{};
+const okCfg=typeof cfg.url==="string"&&typeof cfg.anonKey==="string"&&cfg.url&&cfg.anonKey&&!cfg.url.includes("REPLACE_")&&!cfg.anonKey.includes("REPLACE_");
+const sb=okCfg&&window.supabase?.createClient?window.supabase.createClient(cfg.url,cfg.anonKey):null;
+
+const getLocalSess=()=>parse(localStorage.getItem(SESS));
+const setLocalSess=s=>localStorage.setItem(SESS,JSON.stringify(s));
+const clearLocalSess=()=>localStorage.removeItem(SESS);
+const getLocalMap=()=>{const p=parse(localStorage.getItem(PROF));return p&&typeof p==="object"?p:{};};
+const setLocalMap=m=>localStorage.setItem(PROF,JSON.stringify(m));
+const upLocal=(email,patch)=>{if(!email)return;const m=getLocalMap();m[email]={...(m[email]||{}),...patch,updatedAt:Date.now()};setLocalMap(m);};
+const getLocalProfile=()=>{const s=getLocalSess();if(!s?.email)return null;return getLocalMap()[s.email]||null;};
+
+const def=(email="",name="",phone="")=>({
+  name:name||email.split("@")[0]||"Proveedor",category:"",location:"Valencia y alrededores",description:"",
+  contactEmail:email,phone,rating:"",responseTime:"24-48h",
+  availability:"Fechas mas solicitadas: mayo, junio, septiembre y octubre. Recomendamos reservar con 9-12 meses de antelacion.",
+  packages:[
+    {name:"Pack Esencial",price:"950",currency:"EUR",items:["Cobertura de ceremonia y retratos","Entrega digital editada","Reunion previa"]},
+    {name:"Pack Completo",price:"1450",currency:"EUR",items:["Cobertura completa del dia","Sesion pre o post boda","Galeria privada para invitados"]}
+  ],
+  faqs:[
+    {question:"Incluye desplazamiento?",answer:"Si dentro de Valencia ciudad. Para alrededores se confirma segun ubicacion."},
+    {question:"Cuando se entrega el reportaje?",answer:"Normalmente entre 4 y 8 semanas segun temporada."}
+  ]
 });
+const p1=(o,ks,d="")=>{if(!o||typeof o!=="object")return d;for(const k of ks){if(o[k]!=null)return o[k];}return d;};
+const normItems=v=>Array.isArray(v)?v.map(x=>String(x).trim()).filter(Boolean).slice(0,10):typeof v==="string"?v.split("\n").map(x=>x.trim()).filter(Boolean).slice(0,10):[];
+const normPkg=(p,i=1)=>{const name=String(p1(p,["name","title","package_name"],"")).trim(),price=String(p1(p,["price","price_from","price_eur"],"")).trim(),currency=String(p1(p,["currency"],"EUR")||"EUR").trim(),items=normItems(p1(p,["items","includes"],[]));if(!name&&!price&&!items.length)return null;return{name:name||`Paquete ${i}`,price,currency,items};};
+const normFaq=f=>{const question=String(p1(f,["question"],"")).trim(),answer=String(p1(f,["answer"],"")).trim();return question&&answer?{question,answer}:null;};
 
-document.querySelectorAll(".nav-links a").forEach((link) => {
-  link.addEventListener("click", () => {
-    navLinks?.classList.remove("open");
-    if (toggleButton) {
-      toggleButton.setAttribute("aria-expanded", "false");
-    }
-  });
-});
+async function sbSession(){if(!sb)return null;const {data,error}=await sb.auth.getSession();if(error)return null;return data?.session||null;}
+async function active(){if(sb){const s=await sbSession();if(s?.user?.email)return{source:"supabase",email:s.user.email,userId:s.user.id,raw:s};}const l=getLocalSess();return l?.email?{...l,source:"local"}:null;}
+async function signOut(){if(sb)await sb.auth.signOut();clearLocalSess();}
 
-if (toggleButton) {
-  toggleButton.setAttribute("aria-expanded", "false");
+async function ensureVendor(user,seed={}){if(!sb||!user?.id)return null;const d=def(user.email||"",seed.name||"",seed.phone||"");
+  const patch={id:user.id,email:user.email||"",contact_email:seed.contactEmail||user.email||"",name:seed.name||d.name,category:seed.category||"",location:seed.location||d.location,description:seed.description||"",phone:seed.phone||"",response_time:seed.responseTime||d.responseTime,availability:seed.availability||d.availability};
+  const r=await sb.from("vendors").upsert(patch,{onConflict:"id"}).select("id").maybeSingle();return r.error?null:(r.data||{id:user.id});
 }
 
-const STORAGE_VENDOR_SESSION_KEY = "nova_vendor_session_v1";
-const STORAGE_VENDOR_PROFILES_KEY = "nova_vendor_profiles_v1";
-
-const safeJsonParse = (value) => {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return null;
-  }
-};
-
-const getVendorSession = () =>
-  safeJsonParse(localStorage.getItem(STORAGE_VENDOR_SESSION_KEY));
-
-const setVendorSession = (session) => {
-  localStorage.setItem(STORAGE_VENDOR_SESSION_KEY, JSON.stringify(session));
-};
-
-const clearVendorSession = () => {
-  localStorage.removeItem(STORAGE_VENDOR_SESSION_KEY);
-};
-
-const getVendorProfiles = () => {
-  const parsed = safeJsonParse(localStorage.getItem(STORAGE_VENDOR_PROFILES_KEY));
-  return parsed && typeof parsed === "object" ? parsed : {};
-};
-
-const setVendorProfiles = (profiles) => {
-  localStorage.setItem(STORAGE_VENDOR_PROFILES_KEY, JSON.stringify(profiles));
-};
-
-const upsertVendorProfile = (email, patch) => {
-  if (!email) return;
-  const profiles = getVendorProfiles();
-  profiles[email] = { ...(profiles[email] || {}), ...patch, updatedAt: Date.now() };
-  setVendorProfiles(profiles);
-};
-
-const getCurrentVendorProfile = () => {
-  const session = getVendorSession();
-  if (!session?.email) return null;
-  const profiles = getVendorProfiles();
-  return profiles[session.email] || null;
-};
-
-const isProvidersSubdir = window.location.pathname.includes(
-  "/proveedores-boda-valencia/"
-);
-
-const navLogin = document.querySelector(".nav-login");
-if (navLogin) {
-  const session = getVendorSession();
-  if (session?.email) {
-    navLogin.textContent = "Mi cuenta";
-    navLogin.setAttribute(
-      "href",
-      isProvidersSubdir ? "../vendor-dashboard.html" : "vendor-dashboard.html"
-    );
-  } else {
-    navLogin.textContent = "Iniciar sesión";
-    navLogin.setAttribute(
-      "href",
-      isProvidersSubdir ? "../vendors-auth.html" : "vendors-auth.html"
-    );
-  }
+async function loadByUser(userId,email=""){if(!sb||!userId)return null;
+  const v=await sb.from("vendors").select("*").eq("id",userId).maybeSingle();if(v.error||!v.data)return null;
+  const ps=await sb.from("vendor_packages").select("*").eq("vendor_id",userId).order("position",{ascending:true});
+  const fs=await sb.from("vendor_faqs").select("*").eq("vendor_id",userId).order("position",{ascending:true});
+  const b=def(p1(v.data,["contact_email","email"],email),p1(v.data,["name","business_name"],""),p1(v.data,["phone"],""));
+  const out={...b,name:String(p1(v.data,["name","business_name"],b.name)),category:String(p1(v.data,["category"],b.category)),location:String(p1(v.data,["location"],b.location)),description:String(p1(v.data,["description","short_description"],b.description)),contactEmail:String(p1(v.data,["contact_email","email"],b.contactEmail)),phone:String(p1(v.data,["phone"],b.phone)),rating:String(p1(v.data,["rating"],b.rating)),responseTime:String(p1(v.data,["response_time","response_time_text"],b.responseTime)),availability:String(p1(v.data,["availability","availability_notes"],b.availability))};
+  const pk=(Array.isArray(ps.data)?ps.data:[]).map((x,i)=>normPkg(x,i+1)).filter(Boolean).slice(0,2);
+  const fq=(Array.isArray(fs.data)?fs.data:[]).map(normFaq).filter(Boolean).slice(0,20);
+  if(pk.length)out.packages=pk;if(fq.length)out.faqs=fq;return out;
 }
 
-const vendorProfileHref = window.location.pathname.includes(
-  "/proveedores-boda-valencia/"
-)
-  ? "../vendor-profile.html"
-  : "vendor-profile.html";
-
-document.querySelectorAll(".vendor-card-page .btn.ghost").forEach((button) => {
-  button.textContent = "Solicitar info";
-  button.setAttribute("href", vendorProfileHref);
-});
-
-document.querySelectorAll(".vendor-card-page").forEach((card) => {
-  if (card.querySelector(".vendor-card-body")) return;
-  const image = card.querySelector("img.vendor-image");
-  const nodes = Array.from(card.children).filter((child) => child !== image);
-  const body = document.createElement("div");
-  body.className = "vendor-card-body";
-  nodes.forEach((node) => body.appendChild(node));
-  if (image) {
-    card.appendChild(body);
-  } else {
-    card.prepend(body);
-  }
-});
-
-const categorySearch = document.querySelector("#category-search");
-if (categorySearch) {
-  const categoryTargets = document.querySelectorAll(
-    ".category-grid-list .category-card-link, .category-pill-grid .pill"
-  );
-  const normalize = (value) =>
-    value
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
-  const applyFilter = () => {
-    const term = normalize(categorySearch.value.trim());
-    categoryTargets.forEach((target) => {
-      const label = normalize(target.textContent.trim());
-      const match = term.length === 0 || label.includes(term);
-      target.hidden = !match;
-    });
-  };
-
-  categorySearch.addEventListener("input", applyFilter);
-  applyFilter();
+async function saveProfile(user,patch){if(!sb||!user?.id)return false;
+  const head={id:user.id,email:user.email||"",name:String(patch.name||"").trim(),category:String(patch.category||"").trim(),location:String(patch.location||"").trim(),description:String(patch.description||"").trim(),contact_email:String(patch.contactEmail||user.email||"").trim(),phone:String(patch.phone||"").trim(),response_time:String(patch.responseTime||"").trim(),availability:String(patch.availability||"").trim()};
+  const v=await sb.from("vendors").upsert(head,{onConflict:"id"});if(v.error)return false;
+  const pk=(Array.isArray(patch.packages)?patch.packages:[]).map((x,i)=>normPkg(x,i+1)).filter(Boolean).slice(0,2);
+  const fq=(Array.isArray(patch.faqs)?patch.faqs:[]).map(normFaq).filter(Boolean).slice(0,20);
+  const d1=await sb.from("vendor_packages").delete().eq("vendor_id",user.id);if(d1.error)return false;
+  if(pk.length){const i1=await sb.from("vendor_packages").insert(pk.map((x,i)=>({vendor_id:user.id,name:x.name,price:x.price,currency:x.currency||"EUR",items:x.items||[],position:i+1})));if(i1.error)return false;}
+  const d2=await sb.from("vendor_faqs").delete().eq("vendor_id",user.id);if(d2.error)return false;
+  if(fq.length){const i2=await sb.from("vendor_faqs").insert(fq.map((x,i)=>({vendor_id:user.id,question:x.question,answer:x.answer,position:i+1})));if(i2.error)return false;}
+  return true;
 }
 
-const authTabs = document.querySelectorAll("[data-auth-tab]");
-const authPanels = document.querySelectorAll("[data-auth-panel]");
-
-const activateAuthTab = (target) => {
-  authTabs.forEach((tab) => {
-    const isActive = tab.getAttribute("data-auth-tab") === target;
-    tab.classList.toggle("is-active", isActive);
-    tab.setAttribute("aria-selected", String(isActive));
-  });
-
-  authPanels.forEach((panel) => {
-    const isActive = panel.getAttribute("data-auth-panel") === target;
-    panel.classList.toggle("is-active", isActive);
-  });
-};
-
-authTabs.forEach((tab) => {
-  tab.addEventListener("click", () => {
-    const target = tab.getAttribute("data-auth-tab");
-    if (target) activateAuthTab(target);
-  });
-});
-
-document.querySelectorAll("[data-auth-switch]").forEach((button) => {
-  button.addEventListener("click", () => {
-    const target = button.getAttribute("data-auth-switch");
-    if (target) activateAuthTab(target);
-  });
-});
-
-const loginForm = document.querySelector("#vendorLoginForm");
-if (loginForm) {
-  const existingSession = getVendorSession();
-  if (existingSession?.email && !window.location.search.includes("force=1")) {
-    window.location.href = "vendor-dashboard.html";
-  }
-
-  const emailInput = loginForm.querySelector('input[name="login-email"]');
-  const errorEl = loginForm.querySelector("[data-auth-error]");
-  loginForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (errorEl) {
-      errorEl.hidden = true;
-      errorEl.textContent = "";
-    }
-
-    const email = emailInput?.value?.trim() || "";
-    if (!email) {
-      if (errorEl) {
-        errorEl.textContent = "Introduce tu email para continuar.";
-        errorEl.hidden = false;
-      }
-      emailInput?.focus();
-      return;
-    }
-
-    setVendorSession({ email, loggedInAt: Date.now() });
-    if (!getVendorProfiles()[email]) {
-      upsertVendorProfile(email, {
-        name: email.split("@")[0] || "Proveedor",
-        category: "",
-        location: "Valencia y alrededores",
-        description: "",
-        contactEmail: email,
-        phone: "",
-        rating: "—",
-        responseTime: "24-48h",
-        availability:
-          "Fechas más solicitadas: mayo, junio, septiembre y octubre. Recomendamos reservar con 9-12 meses de antelación.",
-        packages: [
-          {
-            name: "Pack Esencial",
-            price: "950",
-            currency: "EUR",
-            items: [
-              "Cobertura de ceremonia y retratos",
-              "Entrega digital editada",
-              "Reunión previa",
-            ],
-          },
-          {
-            name: "Pack Completo",
-            price: "1450",
-            currency: "EUR",
-            items: [
-              "Cobertura completa del día",
-              "Sesión pre o post boda",
-              "Galería privada para invitados",
-            ],
-          },
-        ],
-        faqs: [
-          {
-            question: "¿Incluye desplazamiento?",
-            answer:
-              "Sí dentro de Valencia ciudad. Para alrededores se confirma según ubicación.",
-          },
-          {
-            question: "¿Cuándo se entrega el reportaje?",
-            answer: "Normalmente entre 4 y 8 semanas según temporada.",
-          },
-        ],
-      });
-    }
-
-    window.location.href = "vendor-dashboard.html";
-  });
+async function loadPublic(vendor){if(!sb||!vendor)return null;
+  let row=null;const s=await sb.from("vendors").select("*").eq("slug",vendor).maybeSingle();if(!s.error&&s.data)row=s.data;
+  if(!row){const i=await sb.from("vendors").select("*").eq("id",vendor).maybeSingle();if(!i.error&&i.data)row=i.data;}
+  if(!row)return null;return loadByUser(row.id,row.email||"");
 }
 
-const signupForm = document.querySelector("#vendorSignupForm");
-if (signupForm) {
-  const nameInput = signupForm.querySelector('input[name="signup-name"]');
-  const emailInput = signupForm.querySelector('input[name="signup-email"]');
-  const phoneInput = signupForm.querySelector('input[name="signup-phone"]');
-  const passwordInput = signupForm.querySelector(
-    'input[name="signup-password"]'
-  );
-  const confirmPasswordInput = signupForm.querySelector(
-    'input[name="signup-confirm-password"]'
-  );
-  const errorEl = signupForm.querySelector("[data-auth-error]");
-
-  if (passwordInput && confirmPasswordInput) {
-    signupForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      if (errorEl) {
-        errorEl.hidden = true;
-        errorEl.textContent = "";
-      }
-
-      if (passwordInput.value !== confirmPasswordInput.value) {
-        confirmPasswordInput.setCustomValidity("Las contraseñas no coinciden.");
-        confirmPasswordInput.reportValidity();
-        return;
-      }
-      confirmPasswordInput.setCustomValidity("");
-
-      const email = emailInput?.value?.trim() || "";
-      const name = nameInput?.value?.trim() || "";
-      const phone = phoneInput?.value?.trim() || "";
-      if (!email || !name) {
-        if (errorEl) {
-          errorEl.textContent = "Completa el nombre comercial y el email.";
-          errorEl.hidden = false;
-        }
-        return;
-      }
-
-      upsertVendorProfile(email, {
-        name,
-        category: "",
-        location: "Valencia y alrededores",
-        description: "",
-        contactEmail: email,
-        phone,
-        rating: "—",
-        responseTime: "24-48h",
-        availability:
-          "Fechas más solicitadas: mayo, junio, septiembre y octubre. Recomendamos reservar con 9-12 meses de antelación.",
-        packages: [
-          {
-            name: "Pack Esencial",
-            price: "950",
-            currency: "EUR",
-            items: [
-              "Cobertura de ceremonia y retratos",
-              "Entrega digital editada",
-              "Reunión previa",
-            ],
-          },
-          {
-            name: "Pack Completo",
-            price: "1450",
-            currency: "EUR",
-            items: [
-              "Cobertura completa del día",
-              "Sesión pre o post boda",
-              "Galería privada para invitados",
-            ],
-          },
-        ],
-        faqs: [
-          {
-            question: "¿Incluye desplazamiento?",
-            answer:
-              "Sí dentro de Valencia ciudad. Para alrededores se confirma según ubicación.",
-          },
-          {
-            question: "¿Cuándo se entrega el reportaje?",
-            answer: "Normalmente entre 4 y 8 semanas según temporada.",
-          },
-        ],
-      });
-      setVendorSession({ email, loggedInAt: Date.now() });
-      window.location.href = "vendor-dashboard.html";
-    });
-
-    confirmPasswordInput.addEventListener("input", () => {
-      if (confirmPasswordInput.validity.customError) {
-        confirmPasswordInput.setCustomValidity("");
-      }
-    });
-  }
+function renderPublic(profile){if(!profile||!q("#publicVendorName"))return;
+  const set=(sel,val)=>{const el=q(sel);if(el&&val)el.textContent=String(val);};
+  set("#publicVendorName",profile.name);set("#publicVendorLead",profile.description);set("#publicVendorCategory",profile.category);set("#publicVendorLocation",profile.location);set("#publicVendorRating",profile.rating||"—");set("#publicVendorResponseTime",profile.responseTime);set("#publicVendorAvailability",profile.availability);
+  const pWrap=q("#publicVendorPackages");if(pWrap){const arr=(Array.isArray(profile.packages)?profile.packages:[]).map((x,i)=>normPkg(x,i+1)).filter(Boolean);if(arr.length){pWrap.innerHTML="";arr.forEach(p=>{const a=document.createElement("article");a.className="panel pricing-card";a.innerHTML=`<div><h3>${p.name}</h3><p class="price">${p.price?`Desde ${p.price} ${p.currency}`:`Consultar ${p.currency}`}</p></div><ul>${(p.items||[]).slice(0,8).map(i=>`<li>${i}</li>`).join("")}</ul>`;pWrap.appendChild(a);});}}
+  const fWrap=q("#publicVendorFaq");if(fWrap){const arr=(Array.isArray(profile.faqs)?profile.faqs:[]).map(normFaq).filter(Boolean).slice(0,12);if(arr.length){fWrap.innerHTML="";arr.forEach(f=>{const d=document.createElement("details");d.innerHTML=`<summary>${f.question}</summary><p>${f.answer}</p>`;fWrap.appendChild(d);});}}
 }
 
-const dashboardForm = document.querySelector("#vendorProfileForm");
-if (dashboardForm) {
-  const session = getVendorSession();
-  if (!session?.email) {
-    window.location.href = "vendors-auth.html";
-  } else {
-    const emailEl = document.querySelector("#vendorSessionEmail");
-    if (emailEl) emailEl.textContent = session.email;
+async function navState(){const a=q(".nav-login");if(!a)return;const s=await active();if(s?.email){a.textContent="Mi cuenta";a.href=isSub?"../vendor-dashboard.html":"vendor-dashboard.html";}else{a.textContent="Iniciar sesion";a.href=isSub?"../vendors-auth.html":"vendors-auth.html";}}
 
-    const logoutBtn = document.querySelector("#vendorLogoutBtn");
-    logoutBtn?.addEventListener("click", () => {
-      clearVendorSession();
-      window.location.href = "vendors-auth.html";
-    });
+qa(".vendor-card-page .btn.ghost").forEach(b=>{b.textContent="Solicitar info";b.href=isSub?"../vendor-profile.html":"vendor-profile.html";});
+qa(".vendor-card-page").forEach(card=>{if(card.querySelector(".vendor-card-body"))return;const img=q("img.vendor-image",card),nodes=[...card.children].filter(c=>c!==img),body=document.createElement("div");body.className="vendor-card-body";nodes.forEach(n=>body.appendChild(n));if(img)card.appendChild(body);else card.prepend(body);});
 
-    const statusEl = document.querySelector("#vendorSaveStatus");
-
-    const profile = getCurrentVendorProfile() || {};
-    const setField = (name, value) => {
-      const el = dashboardForm.querySelector(`[name="${name}"]`);
-      if (!el) return;
-      const nextValue = value || "";
-      // If the saved value isn't in a <select>, preserve it by adding an option.
-      if (el.tagName === "SELECT" && nextValue) {
-        const hasOption = Array.from(el.options).some(
-          (opt) => opt.value === nextValue
-        );
-        if (!hasOption) {
-          const opt = document.createElement("option");
-          opt.value = nextValue;
-          opt.textContent = `${nextValue} (Personalizado)`;
-          el.appendChild(opt);
-        }
-      }
-      el.value = nextValue;
-    };
-
-    setField("name", profile.name);
-    setField("category", profile.category);
-    setField("location", profile.location);
-    setField("description", profile.description);
-    setField("contactEmail", profile.contactEmail || session.email);
-    setField("phone", profile.phone);
-    setField("responseTime", profile.responseTime);
-    setField("availability", profile.availability);
-
-    const packages = Array.isArray(profile.packages) ? profile.packages : [];
-    const toLines = (items) =>
-      Array.isArray(items) ? items.filter(Boolean).join("\n") : "";
-
-    const pkg1 = packages[0] || {};
-    setField("pkg1Name", pkg1.name);
-    setField("pkg1Price", pkg1.price);
-    setField("pkg1Items", toLines(pkg1.items));
-
-    const pkg2 = packages[1] || {};
-    setField("pkg2Name", pkg2.name);
-    setField("pkg2Price", pkg2.price);
-    setField("pkg2Items", toLines(pkg2.items));
-
-    const publicLink = document.querySelector("#vendorPublicProfileLink");
-    if (publicLink) publicLink.setAttribute("href", "vendor-profile.html");
-
-    dashboardForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const data = new FormData(dashboardForm);
-      const parseItems = (raw) =>
-        String(raw || "")
-          .split("\n")
-          .map((s) => s.trim())
-          .filter(Boolean)
-          .slice(0, 10);
-
-      const buildPackage = (idx) => {
-        const name = String(data.get(`pkg${idx}Name`) || "").trim();
-        const price = String(data.get(`pkg${idx}Price`) || "").trim();
-        const items = parseItems(data.get(`pkg${idx}Items`));
-        if (!name && !price && items.length === 0) return null;
-        return { name: name || `Paquete ${idx}`, price, currency: "EUR", items };
-      };
-
-      const nextPackages = [buildPackage(1), buildPackage(2)].filter(Boolean);
-
-      const patch = {
-        name: String(data.get("name") || "").trim(),
-        category: String(data.get("category") || "").trim(),
-        location: String(data.get("location") || "").trim(),
-        description: String(data.get("description") || "").trim(),
-        contactEmail: String(data.get("contactEmail") || "").trim(),
-        phone: String(data.get("phone") || "").trim(),
-        responseTime: String(data.get("responseTime") || "").trim(),
-        availability: String(data.get("availability") || "").trim(),
-        packages: nextPackages,
-      };
-
-      if (!patch.name) {
-        statusEl && (statusEl.textContent = "El nombre comercial es obligatorio.");
-        return;
-      }
-
-      upsertVendorProfile(session.email, patch);
-      if (statusEl) statusEl.textContent = "Guardado.";
-      setTimeout(() => {
-        if (statusEl) statusEl.textContent = "";
-      }, 2200);
-    });
-
-    const faqForm = document.querySelector("#vendorFaqForm");
-    const faqList = document.querySelector("#vendorFaqList");
-    const faqCount = document.querySelector("#vendorFaqCount");
-    const faqStatus = document.querySelector("#vendorFaqStatus");
-
-    const getFaqs = () => {
-      const fresh = getCurrentVendorProfile();
-      const faqs = Array.isArray(fresh?.faqs) ? fresh.faqs : [];
-      return faqs
-        .filter((f) => f && typeof f === "object")
-        .map((f) => ({
-          question: String(f.question || "").trim(),
-          answer: String(f.answer || "").trim(),
-        }))
-        .filter((f) => f.question && f.answer)
-        .slice(0, 20);
-    };
-
-    const renderFaqs = () => {
-      if (!faqList) return;
-      const faqs = getFaqs();
-      faqList.innerHTML = "";
-      if (faqCount) faqCount.textContent = String(faqs.length);
-
-      faqs.forEach((faq, index) => {
-        const li = document.createElement("li");
-        li.className = "faq-admin-item";
-
-        const left = document.createElement("div");
-        const q = document.createElement("strong");
-        q.textContent = faq.question;
-        const a = document.createElement("p");
-        a.textContent = faq.answer;
-        left.appendChild(q);
-        left.appendChild(a);
-
-        const remove = document.createElement("button");
-        remove.type = "button";
-        remove.className = "faq-remove";
-        remove.textContent = "Eliminar";
-        remove.addEventListener("click", () => {
-          const next = getFaqs().filter((_, i) => i !== index);
-          upsertVendorProfile(session.email, { faqs: next });
-          renderFaqs();
-        });
-
-        li.appendChild(left);
-        li.appendChild(remove);
-        faqList.appendChild(li);
-      });
-    };
-
-    renderFaqs();
-
-    faqForm?.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const fd = new FormData(faqForm);
-      const question = String(fd.get("question") || "").trim();
-      const answer = String(fd.get("answer") || "").trim();
-      if (!question || !answer) {
-        if (faqStatus) faqStatus.textContent = "Completa pregunta y respuesta.";
-        setTimeout(() => {
-          if (faqStatus) faqStatus.textContent = "";
-        }, 2200);
-        return;
-      }
-
-      const next = [...getFaqs(), { question, answer }].slice(0, 20);
-      upsertVendorProfile(session.email, { faqs: next });
-      faqForm.reset();
-      if (faqStatus) faqStatus.textContent = "Añadida.";
-      setTimeout(() => {
-        if (faqStatus) faqStatus.textContent = "";
-      }, 1600);
-      renderFaqs();
-    });
-  }
+const cat=q("#category-search");
+if(cat){const targets=qa(".category-grid-list .category-card-link, .category-pill-grid .pill"),norm=v=>v.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  const apply=()=>{const term=norm(cat.value.trim());targets.forEach(t=>{const label=norm(t.textContent.trim());t.hidden=term.length>0&&!label.includes(term);});};
+  cat.addEventListener("input",apply);apply();
 }
 
-const publicNameEl = document.querySelector("#publicVendorName");
-if (publicNameEl) {
-  const profile = getCurrentVendorProfile();
-  if (profile) {
-    const leadEl = document.querySelector("#publicVendorLead");
-    const categoryEl = document.querySelector("#publicVendorCategory");
-    const locationEl = document.querySelector("#publicVendorLocation");
-    const ratingEl = document.querySelector("#publicVendorRating");
-    const responseEl = document.querySelector("#publicVendorResponseTime");
-    const availabilityEl = document.querySelector("#publicVendorAvailability");
-    const packagesEl = document.querySelector("#publicVendorPackages");
-    const faqEl = document.querySelector("#publicVendorFaq");
+const tabs=qa("[data-auth-tab]"),panels=qa("[data-auth-panel]"),showTab=target=>{tabs.forEach(t=>{const on=t.dataset.authTab===target;t.classList.toggle("is-active",on);t.setAttribute("aria-selected",String(on));});panels.forEach(p=>p.classList.toggle("is-active",p.dataset.authPanel===target));};
+tabs.forEach(t=>t.addEventListener("click",()=>t.dataset.authTab&&showTab(t.dataset.authTab)));
+qa("[data-auth-switch]").forEach(b=>b.addEventListener("click",()=>b.dataset.authSwitch&&showTab(b.dataset.authSwitch)));
 
-    if (profile.name) publicNameEl.textContent = profile.name;
-    if (leadEl && profile.description) leadEl.textContent = profile.description;
-    if (categoryEl && profile.category) categoryEl.textContent = profile.category;
-    if (locationEl && profile.location) locationEl.textContent = profile.location;
-    if (ratingEl && profile.rating) ratingEl.textContent = String(profile.rating);
-    if (responseEl && profile.responseTime)
-      responseEl.textContent = String(profile.responseTime);
-    if (availabilityEl && profile.availability)
-      availabilityEl.textContent = String(profile.availability);
+const login=q("#vendorLoginForm");
+if(login)(async()=>{
+  const ex=await active();if(ex?.email&&!location.search.includes("force=1")){location.href="vendor-dashboard.html";return;}
+  const email=q('input[name="login-email"]',login),pass=q('input[name="login-password"]',login),err=q("[data-auth-error]",login);
+  login.addEventListener("submit",async e=>{e.preventDefault();if(err){err.hidden=true;err.textContent="";}const em=email?.value?.trim()||"",pw=pass?.value||"";
+    if(!em){if(err){err.textContent="Introduce tu email para continuar.";err.hidden=false;}email?.focus();return;}
+    if(sb){if(!pw){if(err){err.textContent="Introduce tu contrasena.";err.hidden=false;}pass?.focus();return;}
+      const r=await sb.auth.signInWithPassword({email:em,password:pw});if(r.error||!r.data?.user){if(err){err.textContent="No se pudo iniciar sesion. Revisa email y contrasena.";err.hidden=false;}return;}
+      await ensureVendor(r.data.user,{});
+    }else{setLocalSess({email:em,loggedInAt:Date.now()});if(!getLocalMap()[em])upLocal(em,def(em));}
+    location.href="vendor-dashboard.html";
+  });
+})();
 
-    if (packagesEl) {
-      const packages = Array.isArray(profile.packages) ? profile.packages : [];
-      const clean = packages
-        .filter((p) => p && typeof p === "object")
-        .map((p) => ({
-          name: String(p.name || "").trim(),
-          price: String(p.price || "").trim(),
-          currency: String(p.currency || "EUR").trim(),
-          items: Array.isArray(p.items)
-            ? p.items.map((x) => String(x).trim()).filter(Boolean)
-            : [],
-        }))
-        .filter((p) => p.name);
+const signup=q("#vendorSignupForm");
+if(signup){
+  const name=q('input[name="signup-name"]',signup),email=q('input[name="signup-email"]',signup),phone=q('input[name="signup-phone"]',signup),pass=q('input[name="signup-password"]',signup),pass2=q('input[name="signup-confirm-password"]',signup),err=q("[data-auth-error]",signup);
+  signup.addEventListener("submit",async e=>{e.preventDefault();if(err){err.hidden=true;err.textContent="";}
+    if(!pass||!pass2)return;if(pass.value!==pass2.value){pass2.setCustomValidity("Las contrasenas no coinciden.");pass2.reportValidity();return;}pass2.setCustomValidity("");
+    const em=email?.value?.trim()||"",nm=name?.value?.trim()||"",ph=phone?.value?.trim()||"",pw=pass.value;if(!em||!nm){if(err){err.textContent="Completa el nombre comercial y el email.";err.hidden=false;}return;}
+    if(sb){const r=await sb.auth.signUp({email:em,password:pw});if(r.error){if(err){err.textContent=r.error.message||"No se pudo crear la cuenta.";err.hidden=false;}return;}
+      if(r.data?.user)await ensureVendor(r.data.user,{name:nm,phone:ph,contactEmail:em});
+      if(!r.data?.session){if(err){err.textContent="Cuenta creada. Revisa tu correo para confirmar y luego inicia sesion.";err.hidden=false;}showTab("login");return;}
+    }else{upLocal(em,{...def(em,nm,ph),name:nm,phone:ph,contactEmail:em});setLocalSess({email:em,loggedInAt:Date.now()});}
+    location.href="vendor-dashboard.html";
+  });
+  pass2?.addEventListener("input",()=>{if(pass2.validity.customError)pass2.setCustomValidity("");});
+}
 
-      if (clean.length > 0) {
-        packagesEl.innerHTML = "";
-        clean.forEach((p) => {
-          const card = document.createElement("article");
-          card.className = "panel pricing-card";
-
-          const top = document.createElement("div");
-          const h3 = document.createElement("h3");
-          h3.textContent = p.name;
-          const price = document.createElement("p");
-          price.className = "price";
-          price.textContent = p.price
-            ? `Desde ${p.price} ${p.currency}`
-            : `Consultar ${p.currency}`;
-          top.appendChild(h3);
-          top.appendChild(price);
-
-          const ul = document.createElement("ul");
-          (p.items || []).slice(0, 8).forEach((it) => {
-            const li = document.createElement("li");
-            li.textContent = it;
-            ul.appendChild(li);
-          });
-
-          card.appendChild(top);
-          card.appendChild(ul);
-          packagesEl.appendChild(card);
-        });
-      }
-    }
-
-    if (faqEl) {
-      const faqs = Array.isArray(profile.faqs) ? profile.faqs : [];
-      const cleanFaqs = faqs
-        .filter((f) => f && typeof f === "object")
-        .map((f) => ({
-          question: String(f.question || "").trim(),
-          answer: String(f.answer || "").trim(),
-        }))
-        .filter((f) => f.question && f.answer);
-
-      if (cleanFaqs.length > 0) {
-        faqEl.innerHTML = "";
-        cleanFaqs.slice(0, 12).forEach((f) => {
-          const details = document.createElement("details");
-          const summary = document.createElement("summary");
-          summary.textContent = f.question;
-          const p = document.createElement("p");
-          p.textContent = f.answer;
-          details.appendChild(summary);
-          details.appendChild(p);
-          faqEl.appendChild(details);
-        });
+const dash=q("#vendorProfileForm");
+if(dash)(async()=>{
+  const s=await active();if(!s?.email){location.href="vendors-auth.html";return;}
+  const emailEl=q("#vendorSessionEmail");if(emailEl)emailEl.textContent=s.email;
+  {
+    const publicLink=q("#vendorPublicProfileLink");
+    if(publicLink){
+      if(s.source==="supabase"&&s.userId){
+        publicLink.setAttribute("href",`vendor-profile.html?vendor=${encodeURIComponent(s.userId)}`);
+      }else{
+        publicLink.setAttribute("href","vendor-profile.html");
       }
     }
   }
-}
+  q("#vendorLogoutBtn")?.addEventListener("click",async()=>{await signOut();location.href="vendors-auth.html";});
+  const status=q("#vendorSaveStatus"),faqForm=q("#vendorFaqForm"),faqList=q("#vendorFaqList"),faqCount=q("#vendorFaqCount"),faqStatus=q("#vendorFaqStatus");
+  let profile=null;
+  if(s.source==="supabase"&&s.userId){profile=await loadByUser(s.userId,s.email);if(!profile&&s.raw?.user){await ensureVendor(s.raw.user,{});profile=await loadByUser(s.userId,s.email);}}
+  else profile=getLocalProfile()||def(s.email);
+  if(!profile)profile=def(s.email);
+  const set=(n,v)=>{const el=q(`[name="${n}"]`,dash);if(!el)return;const val=v||"";if(el.tagName==="SELECT"&&val&&!Array.from(el.options).some(o=>o.value===val)){const opt=document.createElement("option");opt.value=val;opt.textContent=`${val} (Personalizado)`;el.appendChild(opt);}el.value=val;};
+  set("name",profile.name);set("category",profile.category);set("location",profile.location);set("description",profile.description);set("contactEmail",profile.contactEmail||s.email);set("phone",profile.phone);set("responseTime",profile.responseTime);set("availability",profile.availability);
+  const pk=Array.isArray(profile.packages)?profile.packages:[],toLines=i=>Array.isArray(i)?i.filter(Boolean).join("\n"):"";
+  set("pkg1Name",pk[0]?.name);set("pkg1Price",pk[0]?.price);set("pkg1Items",toLines(pk[0]?.items));set("pkg2Name",pk[1]?.name);set("pkg2Price",pk[1]?.price);set("pkg2Items",toLines(pk[1]?.items));
+  let faqs=(Array.isArray(profile.faqs)?profile.faqs:[]).map(normFaq).filter(Boolean).slice(0,20);
+  const parseItems=raw=>String(raw||"").split("\n").map(x=>x.trim()).filter(Boolean).slice(0,10);
+  const pack=(fd,i)=>{const name=String(fd.get(`pkg${i}Name`)||"").trim(),price=String(fd.get(`pkg${i}Price`)||"").trim(),items=parseItems(fd.get(`pkg${i}Items`));if(!name&&!price&&!items.length)return null;return{name:name||`Paquete ${i}`,price,currency:"EUR",items};};
+  const patch=()=>{const fd=new FormData(dash);return{name:String(fd.get("name")||"").trim(),category:String(fd.get("category")||"").trim(),location:String(fd.get("location")||"").trim(),description:String(fd.get("description")||"").trim(),contactEmail:String(fd.get("contactEmail")||"").trim(),phone:String(fd.get("phone")||"").trim(),responseTime:String(fd.get("responseTime")||"").trim(),availability:String(fd.get("availability")||"").trim(),packages:[pack(fd,1),pack(fd,2)].filter(Boolean),faqs};};
+  const render=()=>{if(!faqList)return;faqList.innerHTML="";if(faqCount)faqCount.textContent=String(faqs.length);faqs.forEach((f,idx)=>{const li=document.createElement("li");li.className="faq-admin-item";li.innerHTML=`<div><strong>${f.question}</strong><p>${f.answer}</p></div>`;const b=document.createElement("button");b.type="button";b.className="faq-remove";b.textContent="Eliminar";b.addEventListener("click",async()=>{faqs=faqs.filter((_,i)=>i!==idx);let ok=false;const p=patch();if(s.source==="supabase"&&s.raw?.user)ok=await saveProfile(s.raw.user,p);else{upLocal(s.email,p);ok=true;}if(ok)render();});li.appendChild(b);faqList.appendChild(li);});};
+  render();
+  dash.addEventListener("submit",async e=>{e.preventDefault();const p=patch();if(!p.name){if(status)status.textContent="El nombre comercial es obligatorio.";return;}let ok=false;if(s.source==="supabase"&&s.raw?.user)ok=await saveProfile(s.raw.user,p);else{upLocal(s.email,p);ok=true;}if(status)status.textContent=ok?"Guardado.":"Error al guardar.";setTimeout(()=>{if(status)status.textContent="";},2200);});
+  faqForm?.addEventListener("submit",e=>{e.preventDefault();const fd=new FormData(faqForm),question=String(fd.get("question")||"").trim(),answer=String(fd.get("answer")||"").trim();if(!question||!answer){if(faqStatus)faqStatus.textContent="Completa pregunta y respuesta.";setTimeout(()=>{if(faqStatus)faqStatus.textContent="";},2200);return;}faqs=[...faqs,{question,answer}].slice(0,20);faqForm.reset();if(faqStatus)faqStatus.textContent="Anadida.";setTimeout(()=>{if(faqStatus)faqStatus.textContent="";},1600);render();});
+})();
 
-const CONTACT_FORM_ENDPOINT = "https://formsubmit.co/ajax/contacto@novaboda.es";
+if(q("#publicVendorName"))(async()=>{
+  const vendor=new URLSearchParams(location.search).get("vendor");
+  let profile=vendor?await loadPublic(vendor):null;
+  if(!profile){const s=await active();if(s?.source==="supabase"&&s.userId)profile=await loadByUser(s.userId,s.email);else if(s?.email)profile=getLocalProfile();}
+  renderPublic(profile);
+})();
 
-document.querySelectorAll(".cta-form").forEach((contactForm) => {
-  contactForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const button = contactForm.querySelector('button[type="submit"]');
-    if (!button) return;
-
-    const originalText = button.textContent;
-    button.textContent = "Enviando...";
-    button.disabled = true;
-
-    try {
-      const formData = new FormData(contactForm);
-      formData.append("_captcha", "false");
-      formData.append("_subject", "Nueva solicitud desde NOVA BODA");
-
-      const response = await fetch(CONTACT_FORM_ENDPOINT, {
-        method: "POST",
-        headers: { Accept: "application/json" },
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error("contact_submit_failed");
-
-      button.textContent = "Solicitud enviada";
-      contactForm.reset();
-    } catch (error) {
-      button.textContent = "No se pudo enviar";
-    } finally {
-      setTimeout(() => {
-        button.textContent = originalText;
-        button.disabled = false;
-      }, 2400);
-    }
-  });
-});
+const ENDPOINT="https://formsubmit.co/ajax/contacto@novaboda.es";
+qa(".cta-form").forEach(f=>f.addEventListener("submit",async e=>{e.preventDefault();const b=q('button[type="submit"]',f);if(!b)return;const txt=b.textContent;b.textContent="Enviando...";b.disabled=true;try{const fd=new FormData(f);fd.append("_captcha","false");fd.append("_subject","Nueva solicitud desde NOVA BODA");const r=await fetch(ENDPOINT,{method:"POST",headers:{Accept:"application/json"},body:fd});if(!r.ok)throw new Error();b.textContent="Solicitud enviada";f.reset();}catch{b.textContent="No se pudo enviar";}finally{setTimeout(()=>{b.textContent=txt;b.disabled=false;},2400);}}));
+navState();
