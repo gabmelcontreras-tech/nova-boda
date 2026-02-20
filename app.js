@@ -98,22 +98,38 @@ tabs.forEach(t=>t.addEventListener("click",()=>t.dataset.authTab&&showTab(t.data
 qa("[data-auth-switch]").forEach(b=>b.addEventListener("click",()=>b.dataset.authSwitch&&showTab(b.dataset.authSwitch)));
 
 const forgotBtn=q("#vendorForgotPasswordBtn"),forgotStatus=q("#vendorForgotPasswordStatus"),resetForm=q("#vendorResetPasswordForm"),resetStatus=q("#vendorResetPasswordStatus");
+const googleLoginBtn=q("#vendorGoogleLoginBtn"),googleSignupBtn=q("#vendorGoogleSignupBtn"),googleLoginStatus=q("#vendorGoogleLoginStatus"),googleSignupStatus=q("#vendorGoogleSignupStatus");
 const inRecoveryMode=location.search.includes("mode=reset")||location.hash.includes("type=recovery")||location.hash.includes("access_token");
 if(inRecoveryMode&&resetForm){resetForm.hidden=false;showTab("login");}
 if(sb&&resetForm){sb.auth.onAuthStateChange((event)=>{if(event==="PASSWORD_RECOVERY"){resetForm.hidden=false;showTab("login");}});}
+
+const runForgotPassword=async(emailValue)=>{
+  if(forgotStatus)forgotStatus.textContent="";
+  const em=String(emailValue||"").trim();
+  if(!em){if(forgotStatus)forgotStatus.textContent="Escribe tu email y vuelve a pulsar.";return;}
+  if(!sb){if(forgotStatus)forgotStatus.textContent="Recuperacion disponible solo con Supabase activo.";return;}
+  const redirectTo=`${location.origin}/vendors-auth.html?mode=reset`;
+  const r=await sb.auth.resetPasswordForEmail(em,{redirectTo});
+  if(r.error){if(forgotStatus)forgotStatus.textContent=r.error.message||"No se pudo enviar el email de recuperacion.";return;}
+  if(forgotStatus)forgotStatus.textContent="Te enviamos un email para restablecer la contrasena.";
+};
+
+const runGoogleOAuth=async(statusEl)=>{
+  if(statusEl)statusEl.textContent="";
+  if(!sb){if(statusEl)statusEl.textContent="Google login requiere Supabase activo.";return;}
+  const redirectTo=`${location.origin}/vendors-auth.html`;
+  const r=await sb.auth.signInWithOAuth({provider:"google",options:{redirectTo}});
+  if(r.error&&statusEl){statusEl.textContent=r.error.message||"No se pudo iniciar con Google.";}
+};
+
+googleLoginBtn?.addEventListener("click",()=>runGoogleOAuth(googleLoginStatus));
+googleSignupBtn?.addEventListener("click",()=>runGoogleOAuth(googleSignupStatus));
 
 const login=q("#vendorLoginForm");
 if(login)(async()=>{
   const ex=await active();if(ex?.email&&!location.search.includes("force=1")){location.href="vendor-dashboard.html";return;}
   const email=q('input[name="login-email"]',login),pass=q('input[name="login-password"]',login),err=q("[data-auth-error]",login);
-  forgotBtn?.addEventListener("click",async()=>{if(forgotStatus)forgotStatus.textContent="";
-    const em=email?.value?.trim()||"";if(!em){if(forgotStatus)forgotStatus.textContent="Escribe tu email y vuelve a pulsar.";email?.focus();return;}
-    if(!sb){if(forgotStatus)forgotStatus.textContent="Recuperacion disponible solo con Supabase activo.";return;}
-    const redirectTo=`${location.origin}/vendors-auth.html?mode=reset`;
-    const r=await sb.auth.resetPasswordForEmail(em,{redirectTo});
-    if(r.error){if(forgotStatus)forgotStatus.textContent=r.error.message||"No se pudo enviar el email de recuperacion.";return;}
-    if(forgotStatus)forgotStatus.textContent="Te enviamos un email para restablecer la contrasena.";
-  });
+  forgotBtn?.addEventListener("click",()=>runForgotPassword(email?.value||""));
   login.addEventListener("submit",async e=>{e.preventDefault();if(err){err.hidden=true;err.textContent="";}const em=email?.value?.trim()||"",pw=pass?.value||"";
     if(!em){if(err){err.textContent="Introduce tu email para continuar.";err.hidden=false;}email?.focus();return;}
     if(sb){if(!pw){if(err){err.textContent="Introduce tu contrasena.";err.hidden=false;}pass?.focus();return;}
