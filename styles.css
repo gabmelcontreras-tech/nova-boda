@@ -665,26 +665,6 @@ h1 {
   height: 100%;
 }
 
-.category-card:nth-child(2) {
-  background: #fef3f0;
-}
-
-.category-card:nth-child(3) {
-  background: #f7f0f4;
-}
-
-.category-card:nth-child(4) {
-  background: #f5eef1;
-}
-
-.category-card:nth-child(5) {
-  background: #f6f1ec;
-}
-
-.category-card:nth-child(6) {
-  background: #f8f0ea;
-}
-
 .category-card img {
   width: 100%;
   border-radius: 18px;
