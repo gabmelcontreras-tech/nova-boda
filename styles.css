@@ -334,6 +334,11 @@ h1 {
   height: 100%;
 }
 
+.section#services .panel > * {
+  width: 100%;
+  text-align: center;
+}
+
 .section#services .panel h3 {
   font-family: "Playfair Display", "Times New Roman", serif;
   font-size: 1.35rem;
@@ -355,7 +360,7 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 6px;
+  margin: 0 auto 6px;
 }
 
 .feature-icon svg {
