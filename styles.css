@@ -339,6 +339,13 @@ h1 {
   text-align: center;
 }
 
+.section#services .panel > .feature-icon {
+  width: 74px !important;
+  height: 74px !important;
+  flex: 0 0 74px;
+  align-self: center;
+}
+
 .section#services .panel h3 {
   font-family: "Playfair Display", "Times New Roman", serif;
   font-size: 1.35rem;
@@ -371,8 +378,8 @@ h1 {
 }
 
 .feature-icon img {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
   display: block;
   margin: auto;
