@@ -100,37 +100,40 @@ if(cat){const targets=qa(".category-grid-list .category-card-link, .category-pil
 const heroSearch=q("#heroSearchForm");
 if(heroSearch){
   const heroQuery=q("#hero-query",heroSearch);
+  const heroWhere=q("#hero-location",heroSearch);
+  const heroSheetQuery=q("#hero-sheet-query");
   const dropdown=q("#heroCategoryDropdown");
   const grid=q("#heroCategoryDropdownGrid");
   const backdrop=q("#heroCategoryBackdrop");
+  const closeBtn=q("#heroCategoryClose");
   const wrap=q(".hero-search-wrap");
   const mobileSheet=window.matchMedia("(max-width: 640px)");
   let closeTimer=0;
   const groups=[
     {title:"Servicios populares",items:[
-      {label:"Fotografia",href:"proveedores-boda-valencia/fotografos-boda-valencia.html"},
-      {label:"Videografia",href:"proveedores-boda-valencia/videografos-boda-valencia.html"},
-      {label:"Musica y DJ",href:"proveedores-boda-valencia/dj-boda-valencia.html"},
-      {label:"Catering",href:"proveedores-boda-valencia/catering-boda-valencia.html"},
-      {label:"Decoracion",href:"proveedores-boda-valencia/decoracion-boda-valencia.html"},
-      {label:"Floristerias",href:"proveedores-boda-valencia/floristerias-boda-valencia.html"},
-      {label:"Pasteleria",href:"proveedores-boda-valencia/pasteleria-boda-valencia.html"}
+      {icon:"📷",label:"Fotografia",href:"proveedores-boda-valencia/fotografos-boda-valencia.html"},
+      {icon:"🎬",label:"Videografia",href:"proveedores-boda-valencia/videografos-boda-valencia.html"},
+      {icon:"🎵",label:"Musica y DJ",href:"proveedores-boda-valencia/dj-boda-valencia.html"},
+      {icon:"🍽",label:"Catering",href:"proveedores-boda-valencia/catering-boda-valencia.html"},
+      {icon:"✨",label:"Decoracion",href:"proveedores-boda-valencia/decoracion-boda-valencia.html"},
+      {icon:"💐",label:"Floristerias",href:"proveedores-boda-valencia/floristerias-boda-valencia.html"},
+      {icon:"🎂",label:"Pasteleria",href:"proveedores-boda-valencia/pasteleria-boda-valencia.html"}
     ]},
     {title:"Planificacion y estilo",items:[
-      {label:"Planificadores de boda",href:"proveedores-boda-valencia/planificadores-de-boda-valencia.html"},
-      {label:"Invitaciones y papeleria",href:"proveedores-boda-valencia/invitaciones-papeleria-boda-valencia.html"},
-      {label:"Maquillaje y peluqueria",href:"proveedores-boda-valencia/maquillaje-y-peluqueria-boda-valencia.html"},
-      {label:"Salones de novia",href:"proveedores-boda-valencia/salones-novia-valencia.html"},
-      {label:"Joyeria",href:"proveedores-boda-valencia/joyeria-boda-valencia.html"},
-      {label:"Clases de baile",href:"proveedores-boda-valencia/clases-baile-boda-valencia.html"}
+      {icon:"🗂",label:"Planificadores de boda",href:"proveedores-boda-valencia/planificadores-de-boda-valencia.html"},
+      {icon:"✉",label:"Invitaciones y papeleria",href:"proveedores-boda-valencia/invitaciones-papeleria-boda-valencia.html"},
+      {icon:"💄",label:"Maquillaje y peluqueria",href:"proveedores-boda-valencia/maquillaje-y-peluqueria-boda-valencia.html"},
+      {icon:"👗",label:"Salones de novia",href:"proveedores-boda-valencia/salones-novia-valencia.html"},
+      {icon:"💍",label:"Joyeria",href:"proveedores-boda-valencia/joyeria-boda-valencia.html"},
+      {icon:"💃",label:"Clases de baile",href:"proveedores-boda-valencia/clases-baile-boda-valencia.html"}
     ]},
     {title:"Lugares y extras",items:[
-      {label:"Fincas y espacios",href:"proveedores-boda-valencia/fincas-boda-valencia.html"},
-      {label:"Servicios de bar",href:"proveedores-boda-valencia/servicios-bar-boda-valencia.html"},
-      {label:"Bandas",href:"proveedores-boda-valencia/bandas-boda-valencia.html"},
-      {label:"Transporte",href:"proveedores-boda-valencia/transporte-boda-valencia.html"},
-      {label:"Bloques de habitaciones",href:"proveedores-boda-valencia/bloques-habitaciones-boda-valencia.html"},
-      {label:"Alquileres",href:"proveedores-boda-valencia/alquileres-boda-valencia.html"}
+      {icon:"🏡",label:"Fincas y espacios",href:"proveedores-boda-valencia/fincas-boda-valencia.html"},
+      {icon:"🍸",label:"Servicios de bar",href:"proveedores-boda-valencia/servicios-bar-boda-valencia.html"},
+      {icon:"🎸",label:"Bandas",href:"proveedores-boda-valencia/bandas-boda-valencia.html"},
+      {icon:"🚗",label:"Transporte",href:"proveedores-boda-valencia/transporte-boda-valencia.html"},
+      {icon:"🏨",label:"Bloques de habitaciones",href:"proveedores-boda-valencia/bloques-habitaciones-boda-valencia.html"},
+      {icon:"🪑",label:"Alquileres",href:"proveedores-boda-valencia/alquileres-boda-valencia.html"}
     ]}
   ];
   const routeRules=[
@@ -187,6 +190,7 @@ if(heroSearch){
       document.body.classList.add("hero-sheet-open");
       if(backdrop){backdrop.hidden=false;requestAnimationFrame(()=>backdrop.classList.add("is-open"));}
       requestAnimationFrame(()=>dropdown.classList.add("is-open"));
+      if(heroSheetQuery){heroSheetQuery.value=heroQuery?.value||"";setTimeout(()=>heroSheetQuery.focus(),20);}
       return;
     }
     dropdown.classList.add("is-open");
@@ -213,14 +217,17 @@ if(heroSearch){
     const f=norm(term.trim());
     const cols=groups.map(g=>({title:g.title,items:g.items.filter(i=>!f||norm(i.label).includes(f))})).filter(g=>g.items.length);
     if(!cols.length){grid.innerHTML='<p class="hero-search-dropdown-empty">No hay categorias para esa busqueda.</p>';return;}
-    grid.innerHTML=cols.map(g=>`<section class="hero-search-dropdown-column"><p class="hero-search-dropdown-title">${g.title}</p>${g.items.map(i=>`<button type="button" role="option" class="hero-search-dropdown-item" data-label="${i.label}" data-href="${i.href}">${i.label}</button>`).join("")}</section>`).join("");
-    qa(".hero-search-dropdown-item",grid).forEach(btn=>btn.addEventListener("click",()=>{const label=btn.dataset.label||"";const href=btn.dataset.href||"";if(heroQuery)heroQuery.value=label;close();if(href)location.href=href;}));
+    grid.innerHTML=cols.map(g=>`<section class="hero-search-dropdown-column"><p class="hero-search-dropdown-title">${g.title}</p>${g.items.map(i=>`<button type="button" role="option" class="hero-search-dropdown-item" data-label="${i.label}" data-href="${i.href}"><span class="hero-search-dropdown-icon" aria-hidden="true">${i.icon||""}</span><span>${i.label}</span></button>`).join("")}</section>`).join("");
+    qa(".hero-search-dropdown-item",grid).forEach(btn=>btn.addEventListener("click",()=>{const label=btn.dataset.label||"";const href=btn.dataset.href||"";if(heroQuery)heroQuery.value=label;if(heroSheetQuery)heroSheetQuery.value=label;close();if(href)location.href=href;}));
   };
   heroQuery?.addEventListener("focus",()=>{render(heroQuery.value);open();});
-  heroQuery?.addEventListener("input",()=>{render(heroQuery.value);open();});
+  heroQuery?.addEventListener("input",()=>{if(heroSheetQuery)heroSheetQuery.value=heroQuery.value;render(heroQuery.value);open();});
+  heroSheetQuery?.addEventListener("input",()=>{if(heroQuery)heroQuery.value=heroSheetQuery.value;render(heroSheetQuery.value);});
+  heroSheetQuery?.addEventListener("keydown",e=>{if(e.key==="Escape")close();if(e.key==="Enter"){e.preventDefault();heroSearch.requestSubmit();}});
   heroQuery?.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
   document.addEventListener("click",e=>{if(!wrap?.contains(e.target))close();});
   backdrop?.addEventListener("click",close);
+  closeBtn?.addEventListener("click",close);
   mobileSheet.addEventListener("change",e=>{
     if(!e.matches&&backdrop){
       backdrop.classList.remove("is-open");
@@ -236,10 +243,12 @@ if(heroSearch){
   heroSearch.addEventListener("submit",e=>{
     e.preventDefault();
     const query=(heroQuery?.value||"").trim();
+    const where=(heroWhere?.value||"").trim();
     const direct=routeFromQuery(query);
     if(direct){location.href=direct;return;}
     const p=new URLSearchParams();
     if(query)p.set("q",query);
+    if(where)p.set("where",where);
     const qs=p.toString();
     location.href=`proveedores-boda-valencia.html${qs?`?${qs}`:""}`;
   });
