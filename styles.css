@@ -365,6 +365,8 @@ h1 {
   width: 24px;
   height: 24px;
   object-fit: contain;
+  display: block;
+  margin: auto;
 }
 
 /* Section 3: Como funciona */
