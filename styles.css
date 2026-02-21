@@ -2189,14 +2189,17 @@ h1 {
 
 @media (max-width: 640px) {
   .hero-search {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) auto;
     border-radius: 0;
+    min-height: 56px;
   }
 
   .hero-search-submit {
-    min-height: 44px;
-    width: 100%;
-    font-size: 0.9rem;
+    min-height: auto;
+    width: auto;
+    min-width: 98px;
+    font-size: 0.86rem;
+    padding: 0 0.9rem;
   }
 
   .hero-search-dropdown-grid {
@@ -2213,7 +2216,7 @@ h1 {
   }
 
   .hero-search-dropdown {
-    max-height: min(52vh, 380px);
+    max-height: min(50vh, 340px);
   }
 
   .nav {
@@ -2431,9 +2434,34 @@ h1 {
   }
 }
 
+@media (max-width: 520px) {
+  .hero-search {
+    grid-template-columns: 1fr;
+    min-height: 52px;
+  }
+
+  .hero-search-field {
+    padding: 0.6rem 0.7rem;
+  }
+
+  .hero-search-field input {
+    font-size: 0.9rem;
+  }
+
+  .hero-search-submit {
+    width: 100%;
+    min-height: 42px;
+    font-size: 0.85rem;
+  }
+
+  .hero-search-dropdown {
+    max-height: min(46vh, 300px);
+  }
+}
+
 @media (max-width: 390px) {
   .hero-search {
-    min-height: 54px;
+    min-height: 50px;
   }
 
   .hero-search-field {
