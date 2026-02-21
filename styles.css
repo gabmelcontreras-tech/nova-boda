@@ -665,6 +665,10 @@ h1 {
   height: 100%;
 }
 
+.vendor-categories .category-card {
+  background: #ffffff !important;
+}
+
 .category-card img {
   width: 100%;
   border-radius: 18px;
