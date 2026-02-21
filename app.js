@@ -111,29 +111,29 @@ if(heroSearch){
   let closeTimer=0;
   const groups=[
     {title:"Servicios populares",items:[
-      {icon:"📷",label:"Fotografia",href:"proveedores-boda-valencia/fotografos-boda-valencia.html"},
-      {icon:"🎬",label:"Videografia",href:"proveedores-boda-valencia/videografos-boda-valencia.html"},
-      {icon:"🎵",label:"Musica y DJ",href:"proveedores-boda-valencia/dj-boda-valencia.html"},
-      {icon:"🍽",label:"Catering",href:"proveedores-boda-valencia/catering-boda-valencia.html"},
-      {icon:"✨",label:"Decoracion",href:"proveedores-boda-valencia/decoracion-boda-valencia.html"},
-      {icon:"💐",label:"Floristerias",href:"proveedores-boda-valencia/floristerias-boda-valencia.html"},
-      {icon:"🎂",label:"Pasteleria",href:"proveedores-boda-valencia/pasteleria-boda-valencia.html"}
+      {label:"Fotografía",href:"proveedores-boda-valencia/fotografos-boda-valencia.html"},
+      {label:"Videografía",href:"proveedores-boda-valencia/videografos-boda-valencia.html"},
+      {label:"Música y DJ",href:"proveedores-boda-valencia/dj-boda-valencia.html"},
+      {label:"Catering",href:"proveedores-boda-valencia/catering-boda-valencia.html"},
+      {label:"Decoración",href:"proveedores-boda-valencia/decoracion-boda-valencia.html"},
+      {label:"Floristerías",href:"proveedores-boda-valencia/floristerias-boda-valencia.html"},
+      {label:"Pastelería",href:"proveedores-boda-valencia/pasteleria-boda-valencia.html"}
     ]},
     {title:"Planificacion y estilo",items:[
-      {icon:"🗂",label:"Planificadores de boda",href:"proveedores-boda-valencia/planificadores-de-boda-valencia.html"},
-      {icon:"✉",label:"Invitaciones y papeleria",href:"proveedores-boda-valencia/invitaciones-papeleria-boda-valencia.html"},
-      {icon:"💄",label:"Maquillaje y peluqueria",href:"proveedores-boda-valencia/maquillaje-y-peluqueria-boda-valencia.html"},
-      {icon:"👗",label:"Salones de novia",href:"proveedores-boda-valencia/salones-novia-valencia.html"},
-      {icon:"💍",label:"Joyeria",href:"proveedores-boda-valencia/joyeria-boda-valencia.html"},
-      {icon:"💃",label:"Clases de baile",href:"proveedores-boda-valencia/clases-baile-boda-valencia.html"}
+      {label:"Planificadores de boda",href:"proveedores-boda-valencia/planificadores-de-boda-valencia.html"},
+      {label:"Invitaciones y papelería",href:"proveedores-boda-valencia/invitaciones-papeleria-boda-valencia.html"},
+      {label:"Maquillaje y peluquería",href:"proveedores-boda-valencia/maquillaje-y-peluqueria-boda-valencia.html"},
+      {label:"Salones de novia",href:"proveedores-boda-valencia/salones-novia-valencia.html"},
+      {label:"Joyería",href:"proveedores-boda-valencia/joyeria-boda-valencia.html"},
+      {label:"Clases de baile",href:"proveedores-boda-valencia/clases-baile-boda-valencia.html"}
     ]},
     {title:"Lugares y extras",items:[
-      {icon:"🏡",label:"Fincas y espacios",href:"proveedores-boda-valencia/fincas-boda-valencia.html"},
-      {icon:"🍸",label:"Servicios de bar",href:"proveedores-boda-valencia/servicios-bar-boda-valencia.html"},
-      {icon:"🎸",label:"Bandas",href:"proveedores-boda-valencia/bandas-boda-valencia.html"},
-      {icon:"🚗",label:"Transporte",href:"proveedores-boda-valencia/transporte-boda-valencia.html"},
-      {icon:"🏨",label:"Bloques de habitaciones",href:"proveedores-boda-valencia/bloques-habitaciones-boda-valencia.html"},
-      {icon:"🪑",label:"Alquileres",href:"proveedores-boda-valencia/alquileres-boda-valencia.html"}
+      {label:"Fincas y espacios",href:"proveedores-boda-valencia/fincas-boda-valencia.html"},
+      {label:"Servicios de bar",href:"proveedores-boda-valencia/servicios-bar-boda-valencia.html"},
+      {label:"Bandas",href:"proveedores-boda-valencia/bandas-boda-valencia.html"},
+      {label:"Transporte",href:"proveedores-boda-valencia/transporte-boda-valencia.html"},
+      {label:"Bloques de habitaciones",href:"proveedores-boda-valencia/bloques-habitaciones-boda-valencia.html"},
+      {label:"Alquileres",href:"proveedores-boda-valencia/alquileres-boda-valencia.html"}
     ]}
   ];
   const routeRules=[
@@ -217,7 +217,7 @@ if(heroSearch){
     const f=norm(term.trim());
     const cols=groups.map(g=>({title:g.title,items:g.items.filter(i=>!f||norm(i.label).includes(f))})).filter(g=>g.items.length);
     if(!cols.length){grid.innerHTML='<p class="hero-search-dropdown-empty">No hay categorias para esa busqueda.</p>';return;}
-    grid.innerHTML=cols.map(g=>`<section class="hero-search-dropdown-column"><p class="hero-search-dropdown-title">${g.title}</p>${g.items.map(i=>`<button type="button" role="option" class="hero-search-dropdown-item" data-label="${i.label}" data-href="${i.href}"><span class="hero-search-dropdown-icon" aria-hidden="true">${i.icon||""}</span><span>${i.label}</span></button>`).join("")}</section>`).join("");
+    grid.innerHTML=cols.map(g=>`<section class="hero-search-dropdown-column"><p class="hero-search-dropdown-title">${g.title}</p>${g.items.map(i=>`<button type="button" role="option" class="hero-search-dropdown-item" data-label="${i.label}" data-href="${i.href}"><span>${i.label}</span></button>`).join("")}</section>`).join("");
     qa(".hero-search-dropdown-item",grid).forEach(btn=>btn.addEventListener("click",()=>{const label=btn.dataset.label||"";const href=btn.dataset.href||"";if(heroQuery)heroQuery.value=label;if(heroSheetQuery)heroSheetQuery.value=label;close();if(href)location.href=href;}));
   };
   heroQuery?.addEventListener("focus",()=>{render(heroQuery.value);open();});

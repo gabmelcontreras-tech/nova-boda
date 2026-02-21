@@ -350,12 +350,6 @@ h1 {
   gap: 0.52rem;
 }
 
-.hero-search-dropdown-icon {
-  display: none;
-  width: 1.1rem;
-  text-align: center;
-}
-
 .hero-search-dropdown-item:hover,
 .hero-search-dropdown-item:focus-visible {
   background: rgba(232, 163, 183, 0.14);
@@ -2238,7 +2232,7 @@ h1 {
   }
 
   .hero-search-location {
-    display: flex;
+    display: none;
   }
 
   .hero-search-field {
@@ -2356,11 +2350,6 @@ h1 {
     font-size: 1.08rem;
     padding: 0.72rem 0.6rem;
     border-radius: 10px;
-  }
-
-  .hero-search-dropdown-icon {
-    display: inline-block;
-    font-size: 1.2rem;
   }
 
   .nav {
