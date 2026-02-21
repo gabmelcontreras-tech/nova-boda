@@ -177,7 +177,7 @@ h1 {
   color: var(--muted);
   font-size: 1.05rem;
   margin: 0 auto 2rem;
-  max-width: 600px;
+  max-width: 640px;
 }
 
 .sr-only {
@@ -193,34 +193,46 @@ h1 {
 }
 
 .hero-search {
-  width: min(860px, 100%);
-  margin: 0 auto 1.5rem;
+  width: min(880px, 100%);
+  margin: 0 auto;
   background: #ffffff;
-  border: 1px solid rgba(58, 47, 42, 0.14);
-  border-radius: 16px;
+  border: 1px solid rgba(58, 47, 42, 0.16);
+  border-radius: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: stretch;
   overflow: hidden;
-  box-shadow: 0 8px 26px rgba(58, 47, 42, 0.09);
+  box-shadow: 0 10px 24px rgba(58, 47, 42, 0.12);
+  min-height: 60px;
+}
+
+.hero-search-wrap {
+  width: min(880px, 100%);
+  margin: 0 auto 1.5rem;
+  position: relative;
 }
 
 .hero-search-field {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  padding: 0.9rem 1rem;
-}
-
-.hero-search-location {
-  border-left: 1px solid rgba(58, 47, 42, 0.12);
+  gap: 0.75rem;
+  padding: 0.7rem 0.9rem;
+  background: #ffffff;
+  position: relative;
+  border-radius: 0;
 }
 
 .hero-search-icon,
 .hero-search-prefix {
   color: var(--muted);
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   line-height: 1;
+}
+
+.hero-search-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
 }
 
 .hero-search-field input {
@@ -228,7 +240,7 @@ h1 {
   border: none;
   background: transparent;
   color: var(--text);
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .hero-search-field input::placeholder {
@@ -241,22 +253,120 @@ h1 {
 
 .hero-search-submit {
   border: none;
-  background: var(--primary-dark);
+  background: #e74d63;
   color: #ffffff;
   font-weight: 700;
-  font-size: 1.05rem;
-  padding: 0 2rem;
+  font-size: 0.9rem;
+  padding: 0 1.35rem;
+  min-width: 118px;
   cursor: pointer;
 }
 
 .hero-search-submit:hover {
-  background: var(--primary);
+  background: #d94458;
 }
 
-.hero-search-submit:focus-visible,
-.hero-search-field input:focus-visible {
+.hero-search-field:focus-within {
+  box-shadow: inset 0 0 0 2px var(--primary-dark);
+  z-index: 1;
+  border-radius: 0;
+}
+
+.hero-search-submit:focus-visible {
   outline: 2px solid var(--primary-dark);
   outline-offset: -2px;
+}
+
+.hero-search-dropdown {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(58, 47, 42, 0.18);
+  box-shadow: 0 18px 34px rgba(58, 47, 42, 0.16);
+  z-index: 30;
+  max-height: min(64vh, 560px);
+  overflow: auto;
+}
+
+.hero-search-dropdown-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.hero-search-dropdown-column {
+  padding: 14px 10px;
+  border-right: 1px solid rgba(58, 47, 42, 0.12);
+}
+
+.hero-search-dropdown-column:last-child {
+  border-right: 0;
+}
+
+.hero-search-dropdown-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 6px 0.5rem;
+}
+
+.hero-search-dropdown-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  color: var(--text);
+  font-size: 0.98rem;
+  padding: 0.44rem 0.38rem;
+  cursor: pointer;
+}
+
+.hero-search-dropdown-item:hover,
+.hero-search-dropdown-item:focus-visible {
+  background: rgba(232, 163, 183, 0.14);
+  outline: none;
+}
+
+.hero-search-dropdown-empty {
+  padding: 0.9rem 1rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 1200px) {
+  .hero-search-wrap {
+    width: min(840px, 100%);
+  }
+}
+
+@media (max-width: 840px) {
+  .hero-search-wrap {
+    width: 100%;
+  }
+
+  .hero-search-field {
+    padding: 0.64rem 0.78rem;
+  }
+
+  .hero-search-field input {
+    font-size: 0.92rem;
+  }
+
+  .hero-search-submit {
+    min-width: 102px;
+    font-size: 0.86rem;
+    padding: 0 1.05rem;
+  }
+
+  .hero-search-dropdown {
+    top: calc(100% + 6px);
+    max-height: min(58vh, 460px);
+  }
+
+  .hero-search-dropdown-item {
+    font-size: 0.93rem;
+    padding: 0.38rem 0.3rem;
+  }
 }
 
 .hero-actions {
@@ -313,23 +423,6 @@ h1 {
 .nav-toggle:focus-visible {
   outline: 2px solid var(--primary-dark);
   outline-offset: 3px;
-}
-
-.hero-stats {
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.hero-stats strong {
-  font-size: 1.4rem;
-  display: block;
-}
-
-.hero-stats span {
-  color: var(--muted);
-  font-size: 0.9rem;
 }
 
 .hero-card {
@@ -2006,18 +2099,16 @@ h1 {
 }
 
 @media (max-width: 960px) {
-  .hero-search {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .hero-search-location {
-    grid-column: 1 / -1;
-    border-left: none;
-    border-top: 1px solid rgba(58, 47, 42, 0.12);
-  }
-
   .hero-search-submit {
-    min-width: 140px;
+    min-width: 112px;
+  }
+
+  .hero-search-dropdown-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero-search-dropdown-column:nth-child(2n) {
+    border-right: 0;
   }
 
   .section#services .grid {
@@ -2099,15 +2190,30 @@ h1 {
 @media (max-width: 640px) {
   .hero-search {
     grid-template-columns: 1fr;
-    border-radius: 14px;
-  }
-
-  .hero-search-location {
-    border-top: 1px solid rgba(58, 47, 42, 0.12);
+    border-radius: 0;
   }
 
   .hero-search-submit {
-    min-height: 48px;
+    min-height: 44px;
+    width: 100%;
+    font-size: 0.9rem;
+  }
+
+  .hero-search-dropdown-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-search-dropdown-column {
+    border-right: 0;
+    border-bottom: 1px solid rgba(58, 47, 42, 0.12);
+  }
+
+  .hero-search-dropdown-column:last-child {
+    border-bottom: 0;
+  }
+
+  .hero-search-dropdown {
+    max-height: min(52vh, 380px);
   }
 
   .nav {
@@ -2139,20 +2245,6 @@ h1 {
 
   .hero-actions .btn {
     width: 100%;
-  }
-
-  .hero-stats {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.1rem 0.9rem;
-    text-align: center;
-    width: 100%;
-  }
-
-  .hero-stats > div:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
-    justify-self: center;
-    width: fit-content;
   }
 
   .section#services {
@@ -2336,6 +2428,39 @@ h1 {
 
   .footer-links a {
     font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .hero-search {
+    min-height: 54px;
+  }
+
+  .hero-search-field {
+    padding: 0.56rem 0.64rem;
+    gap: 0.58rem;
+  }
+
+  .hero-search-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .hero-search-field input {
+    font-size: 0.88rem;
+  }
+
+  .hero-search-submit {
+    min-height: 42px;
+    font-size: 0.84rem;
+  }
+
+  .hero-search-dropdown-title {
+    font-size: 0.88rem;
+  }
+
+  .hero-search-dropdown-item {
+    font-size: 0.88rem;
   }
 }
 

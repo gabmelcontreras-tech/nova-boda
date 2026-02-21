@@ -114,65 +114,37 @@
       <section class="hero">
         <div class="container hero-content">
           <div>
-            <p class="eyebrow">
-              <span class="badge">
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                  <path
-                    d="M12 20.25s-7.5-4.35-9.6-9.15C1.02 7.47 3.45 4.5 6.6 4.5c2.1 0 3.63 1.23 4.5 2.52.87-1.29 2.4-2.52 4.5-2.52 3.15 0 5.58 2.97 4.2 6.6-2.1 4.8-9.6 9.15-9.6 9.15z"
-                  />
-                </svg>
-              </span>
-            </p>
             <h1>Planifica el día perfecto</h1>
             <p class="lead">
               La plataforma todo en uno para organizar tu boda. Gestiona
               invitados, proveedores, presupuesto y mucho más, en un solo lugar.
             </p>
-            <form class="hero-search" id="heroSearchForm" action="proveedores-boda-valencia.html" method="get">
-              <label class="sr-only" for="hero-query">Buscar por nombre o categoría</label>
-              <div class="hero-search-field">
-                <span class="hero-search-icon" aria-hidden="true">⌕</span>
-                <input
-                  id="hero-query"
-                  name="q"
-                  type="search"
-                  placeholder="Busca por nombre o por categoría"
-                />
-              </div>
-              <label class="sr-only" for="hero-location">Dónde</label>
-              <div class="hero-search-field hero-search-location">
-                <span class="hero-search-prefix" aria-hidden="true">en</span>
-                <input
-                  id="hero-location"
-                  name="where"
-                  type="text"
-                  placeholder="Dónde"
-                  value="Valencia"
-                />
-              </div>
-              <button class="hero-search-submit" type="submit">Buscar</button>
-            </form>
-            <div class="hero-actions">
-              <a class="btn primary" href="#contact">
-                Empezar a planificar
-                <span class="btn-icon" aria-hidden="true">→</span>
-              </a>
-              <a class="btn ghost" href="proveedores-boda-valencia.html">
-                Ver proveedores en Valencia
-              </a>
-            </div>
-            <div class="hero-stats">
-              <div>
-                <strong>+320</strong>
-                <span>Bodas organizadas</span>
-              </div>
-              <div>
-                <strong>4.9/5</strong>
-                <span>Satisfacción media</span>
-              </div>
-              <div>
-                <strong>24/7</strong>
-                <span>Acompañamiento</span>
+            <div class="hero-search-wrap">
+              <form class="hero-search" id="heroSearchForm" action="proveedores-boda-valencia.html" method="get">
+                <label class="sr-only" for="hero-query">Buscar por nombre o categoría</label>
+                <div class="hero-search-field">
+                  <span class="hero-search-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                      <path
+                        d="M10.5 3a7.5 7.5 0 015.93 12.09l4.24 4.24a1 1 0 11-1.42 1.42l-4.24-4.24A7.5 7.5 0 1110.5 3zm0 2a5.5 5.5 0 100 11 5.5 5.5 0 000-11z"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    id="hero-query"
+                    name="q"
+                    type="search"
+                    placeholder="Busca por nombre o por categoría"
+                    autocomplete="off"
+                    aria-haspopup="listbox"
+                    aria-controls="heroCategoryDropdown"
+                    aria-expanded="false"
+                  />
+                </div>
+                <button class="hero-search-submit" type="submit">Buscar</button>
+              </form>
+              <div class="hero-search-dropdown" id="heroCategoryDropdown" hidden>
+                <div class="hero-search-dropdown-grid" id="heroCategoryDropdownGrid" role="listbox"></div>
               </div>
             </div>
           </div>
