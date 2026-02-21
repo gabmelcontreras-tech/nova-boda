@@ -361,6 +361,12 @@ h1 {
   fill: #d989a1;
 }
 
+.feature-icon img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
 /* Section 3: Como funciona */
 .steps {
   background: var(--bg);
@@ -1183,7 +1189,7 @@ h1 {
 }
 
 .category-card-link[href*="bloques-habitaciones-boda-valencia"] .category-thumb {
-  background-image: url("assets/category-images/fotos nova boda/Bloques de habitaciones.png");
+  background-image: url("assets/category-images/fotos nova boda/bloques de habitaciones.png");
 }
 
 .category-card-link[href*="invitaciones-papeleria-boda-valencia"] .category-thumb {
