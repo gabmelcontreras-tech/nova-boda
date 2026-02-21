@@ -89,8 +89,26 @@ qa(".vendor-card-page").forEach(card=>{if(card.querySelector(".vendor-card-body"
 
 const cat=q("#category-search");
 if(cat){const targets=qa(".category-grid-list .category-card-link, .category-pill-grid .pill"),norm=v=>v.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  const params=new URLSearchParams(location.search),qParam=(params.get("q")||"").trim(),whereParam=(params.get("where")||"").trim();
+  const isDefaultWhere=/^valencia(?:\s+y\s+alrededores)?$/i.test(whereParam);
+  const merged=[qParam,!isDefaultWhere?whereParam:""].filter(Boolean).join(" ").trim();
+  if(merged)cat.value=merged;
   const apply=()=>{const term=norm(cat.value.trim());targets.forEach(t=>{const label=norm(t.textContent.trim());t.hidden=term.length>0&&!label.includes(term);});};
   cat.addEventListener("input",apply);apply();
+}
+
+const heroSearch=q("#heroSearchForm");
+if(heroSearch){
+  heroSearch.addEventListener("submit",e=>{
+    e.preventDefault();
+    const query=(q("#hero-query",heroSearch)?.value||"").trim();
+    const where=(q("#hero-location",heroSearch)?.value||"").trim();
+    const p=new URLSearchParams();
+    if(query)p.set("q",query);
+    if(where)p.set("where",where);
+    const qs=p.toString();
+    location.href=`proveedores-boda-valencia.html${qs?`?${qs}`:""}`;
+  });
 }
 
 const tabs=qa("[data-auth-tab]"),panels=qa("[data-auth-panel]"),showTab=target=>{tabs.forEach(t=>{const on=t.dataset.authTab===target;t.classList.toggle("is-active",on);t.setAttribute("aria-selected",String(on));});panels.forEach(p=>p.classList.toggle("is-active",p.dataset.authPanel===target));};

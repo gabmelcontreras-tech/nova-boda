@@ -180,6 +180,85 @@ h1 {
   max-width: 600px;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.hero-search {
+  width: min(860px, 100%);
+  margin: 0 auto 1.5rem;
+  background: #ffffff;
+  border: 1px solid rgba(58, 47, 42, 0.14);
+  border-radius: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) auto;
+  align-items: stretch;
+  overflow: hidden;
+  box-shadow: 0 8px 26px rgba(58, 47, 42, 0.09);
+}
+
+.hero-search-field {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.9rem 1rem;
+}
+
+.hero-search-location {
+  border-left: 1px solid rgba(58, 47, 42, 0.12);
+}
+
+.hero-search-icon,
+.hero-search-prefix {
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.hero-search-field input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.hero-search-field input::placeholder {
+  color: var(--muted);
+}
+
+.hero-search-field input:focus {
+  outline: none;
+}
+
+.hero-search-submit {
+  border: none;
+  background: var(--primary-dark);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 0 2rem;
+  cursor: pointer;
+}
+
+.hero-search-submit:hover {
+  background: var(--primary);
+}
+
+.hero-search-submit:focus-visible,
+.hero-search-field input:focus-visible {
+  outline: 2px solid var(--primary-dark);
+  outline-offset: -2px;
+}
+
 .hero-actions {
   display: flex;
   gap: 1rem;
@@ -1927,6 +2006,20 @@ h1 {
 }
 
 @media (max-width: 960px) {
+  .hero-search {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .hero-search-location {
+    grid-column: 1 / -1;
+    border-left: none;
+    border-top: 1px solid rgba(58, 47, 42, 0.12);
+  }
+
+  .hero-search-submit {
+    min-width: 140px;
+  }
+
   .section#services .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2004,6 +2097,19 @@ h1 {
 }
 
 @media (max-width: 640px) {
+  .hero-search {
+    grid-template-columns: 1fr;
+    border-radius: 14px;
+  }
+
+  .hero-search-location {
+    border-top: 1px solid rgba(58, 47, 42, 0.12);
+  }
+
+  .hero-search-submit {
+    min-height: 48px;
+  }
+
   .nav {
     gap: 0.6rem;
     padding: 0.95rem 0;
