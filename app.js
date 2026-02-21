@@ -102,7 +102,10 @@ if(heroSearch){
   const heroQuery=q("#hero-query",heroSearch);
   const dropdown=q("#heroCategoryDropdown");
   const grid=q("#heroCategoryDropdownGrid");
+  const backdrop=q("#heroCategoryBackdrop");
   const wrap=q(".hero-search-wrap");
+  const mobileSheet=window.matchMedia("(max-width: 640px)");
+  let closeTimer=0;
   const groups=[
     {title:"Servicios populares",items:[
       {label:"Fotografia",href:"proveedores-boda-valencia/fotografos-boda-valencia.html"},
@@ -175,8 +178,36 @@ if(heroSearch){
     });
     return best.score>=78?best.href:null;
   };
-  const open=()=>{if(dropdown)dropdown.hidden=false;heroQuery?.setAttribute("aria-expanded","true");};
-  const close=()=>{if(dropdown)dropdown.hidden=true;heroQuery?.setAttribute("aria-expanded","false");};
+  const open=()=>{
+    if(!dropdown)return;
+    if(closeTimer){clearTimeout(closeTimer);closeTimer=0;}
+    dropdown.hidden=false;
+    heroQuery?.setAttribute("aria-expanded","true");
+    if(mobileSheet.matches){
+      document.body.classList.add("hero-sheet-open");
+      if(backdrop){backdrop.hidden=false;requestAnimationFrame(()=>backdrop.classList.add("is-open"));}
+      requestAnimationFrame(()=>dropdown.classList.add("is-open"));
+      return;
+    }
+    dropdown.classList.add("is-open");
+  };
+  const close=()=>{
+    if(!dropdown)return;
+    heroQuery?.setAttribute("aria-expanded","false");
+    const finalize=()=>{
+      dropdown.classList.remove("is-open");
+      dropdown.hidden=true;
+      if(backdrop){backdrop.classList.remove("is-open");backdrop.hidden=true;}
+      document.body.classList.remove("hero-sheet-open");
+    };
+    if(mobileSheet.matches&& !dropdown.hidden){
+      dropdown.classList.remove("is-open");
+      backdrop?.classList.remove("is-open");
+      closeTimer=window.setTimeout(finalize,220);
+      return;
+    }
+    finalize();
+  };
   const render=(term="")=>{
     if(!grid)return;
     const f=norm(term.trim());
@@ -189,6 +220,19 @@ if(heroSearch){
   heroQuery?.addEventListener("input",()=>{render(heroQuery.value);open();});
   heroQuery?.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
   document.addEventListener("click",e=>{if(!wrap?.contains(e.target))close();});
+  backdrop?.addEventListener("click",close);
+  mobileSheet.addEventListener("change",e=>{
+    if(!e.matches&&backdrop){
+      backdrop.classList.remove("is-open");
+      backdrop.hidden=true;
+      document.body.classList.remove("hero-sheet-open");
+    }
+    if(e.matches&&dropdown&&!dropdown.hidden){
+      requestAnimationFrame(()=>dropdown.classList.add("is-open"));
+      if(backdrop){backdrop.hidden=false;requestAnimationFrame(()=>backdrop.classList.add("is-open"));}
+      document.body.classList.add("hero-sheet-open");
+    }
+  });
   heroSearch.addEventListener("submit",e=>{
     e.preventDefault();
     const query=(heroQuery?.value||"").trim();
