@@ -22,6 +22,7 @@ body {
   color: var(--text);
   background: var(--bg);
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 a {
@@ -66,17 +67,19 @@ img {
   font-weight: 500;
   padding: 0.5rem 1.1rem;
   font-size: 0.85rem;
-  line-height: 1.1;
+  line-height: 1;
+  white-space: nowrap;
+  min-width: 116px;
 }
 
-.btn.nav-login {
+.btn.primary.nav-login {
   background: transparent;
   border: 1px solid var(--primary);
   color: var(--primary-dark);
   box-shadow: none;
 }
 
-.btn.nav-login:hover {
+.btn.primary.nav-login:hover {
   background: rgba(232, 163, 183, 0.16);
   box-shadow: 0 8px 20px rgba(217, 137, 161, 0.2);
 }
@@ -716,10 +719,12 @@ h1 {
   padding: 80px 0;
 }
 
-.category-pill-grid {
-  grid-template-columns: repeat(3, 180px);
-  justify-content: center;
+.pill-grid.category-pill-grid {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  justify-content: stretch;
   gap: 16px;
+  width: 100%;
+  max-width: none;
 }
 
 .category-grid {
@@ -1509,6 +1514,34 @@ h1 {
   margin: 0 auto 2.5rem;
 }
 
+.vendor-team .pill-grid {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  width: 100%;
+  max-width: none;
+}
+
+.vendor-team .pill {
+  width: 100%;
+}
+
+.vendor-team .pill-grid .pill:nth-child(7) {
+  grid-column: auto;
+}
+
+.related-categories .pill-grid {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  width: 100%;
+  max-width: none;
+}
+
+.related-categories .pill {
+  width: 100%;
+}
+
+.related-categories .pill-grid .pill:nth-child(7) {
+  grid-column: auto;
+}
+
 .pill-grid {
   display: grid;
   grid-template-columns: repeat(6, 170px);
@@ -1552,6 +1585,16 @@ h1 {
   grid-column: 2;
 }
 
+.guides-pill-grid {
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.guides-pill-grid .pill {
+  width: 100%;
+}
+
 .section.alt {
   background: #f8eef2;
 }
@@ -1568,6 +1611,55 @@ h1 {
 
 .section-head p {
   color: var(--muted);
+}
+
+.legal-page main .section {
+  padding: 72px 0 88px;
+}
+
+.legal-page main .container {
+  width: min(860px, 92vw);
+  background: #fff;
+  border: 1px solid rgba(120, 98, 90, 0.14);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: clamp(24px, 4vw, 42px);
+}
+
+.legal-page h1 {
+  font-size: clamp(2rem, 4vw, 2.7rem);
+  margin-bottom: 0.85rem;
+}
+
+.legal-page h2 {
+  font-family: "Playfair Display", "Times New Roman", serif;
+  font-size: clamp(1.2rem, 2.1vw, 1.55rem);
+  line-height: 1.25;
+  margin-top: 1.6rem;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.legal-page p,
+.legal-page li {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.legal-page ul {
+  margin: 0.65rem 0 1.1rem 1.15rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.legal-page p + p {
+  margin-top: 0.8rem;
+}
+
+.legal-page a {
+  color: var(--primary-dark);
+  text-decoration: underline;
 }
 
 .grid {
@@ -1672,19 +1764,36 @@ h1 {
 .footer-links {
   display: flex;
   gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
 @media (max-width: 840px) {
+  .nav {
+    position: relative;
+  }
+
+  .nav-right {
+    gap: 0.75rem;
+  }
+
+  .nav-login {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.78rem;
+    min-width: 102px;
+  }
+
   .nav-links {
     position: absolute;
-    right: 5%;
-    top: 72px;
+    right: 0;
+    top: calc(100% + 8px);
     background: var(--card);
     flex-direction: column;
     padding: 1rem 1.5rem;
     border-radius: 12px;
     box-shadow: var(--shadow);
+    width: min(92vw, 360px);
     display: none;
+    z-index: 20;
   }
 
   .nav-links.open {
@@ -1724,7 +1833,7 @@ h1 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .category-pill-grid {
+  .pill-grid.category-pill-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1757,9 +1866,42 @@ h1 {
     padding-left: 0;
     margin-top: 1.5rem;
   }
+
+  .vendor-team .pill-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: none;
+    width: 100%;
+  }
+
+  .vendor-team .pill {
+    width: 100%;
+  }
+
+  .vendor-team .pill-grid .pill:nth-child(7) {
+    grid-column: auto;
+  }
 }
 
 @media (max-width: 640px) {
+  .nav {
+    gap: 0.6rem;
+    padding: 0.95rem 0;
+  }
+
+  .logo-image {
+    height: 40px;
+  }
+
+  .nav-right {
+    margin-left: auto;
+  }
+
+  .nav-login {
+    padding: 0.4rem 0.72rem;
+    font-size: 0.74rem;
+    min-width: 98px;
+  }
+
   h1 {
     font-size: clamp(1.9rem, 8vw, 2.6rem);
   }
@@ -1773,7 +1915,17 @@ h1 {
   }
 
   .hero-stats {
-    justify-content: flex-start;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.1rem 0.9rem;
+    text-align: center;
+    width: 100%;
+  }
+
+  .hero-stats > div:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: fit-content;
   }
 
   .section#services {
@@ -1853,7 +2005,7 @@ h1 {
     grid-template-columns: 1fr;
   }
 
-  .category-pill-grid {
+  .pill-grid.category-pill-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1862,17 +2014,41 @@ h1 {
   }
 
   .pill-grid {
-    grid-template-columns: repeat(3, 160px);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px 14px;
+    width: 100%;
   }
 
   .pill {
-    width: 160px;
+    width: 100%;
     height: 58px;
+    font-size: 0.98rem;
+    padding: 0 10px;
   }
 
   .pill-grid .pill:nth-child(7) {
     grid-column: auto;
+  }
+
+  .pill-grid .pill:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc((100% - 14px) / 2);
+  }
+
+  .guides-pill-grid {
+    grid-template-columns: 1fr;
+    max-width: none;
+  }
+
+  .guides-pill-grid .pill:last-child:nth-child(odd) {
+    grid-column: auto;
+    justify-self: stretch;
+    width: 100%;
+  }
+
+  .vendor-team .section-cta .btn {
+    width: 100%;
   }
 
   .vendor-grid-page {
@@ -1894,5 +2070,67 @@ h1 {
 
   .faq summary::after {
     margin-left: 8px;
+  }
+
+  .legal-page main .section {
+    padding: 56px 0;
+  }
+
+  .legal-page main .container {
+    padding: 22px;
+  }
+
+  .legal-page h2 {
+    font-size: 1.15rem;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .footer-links {
+    width: 100%;
+    gap: 0.85rem 1rem;
+  }
+
+  .footer-links a {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .container {
+    width: min(1120px, 92vw);
+  }
+
+  .nav {
+    gap: 0.4rem;
+    padding: 0.85rem 0;
+  }
+
+  .logo-image {
+    height: 34px;
+  }
+
+  .nav-login {
+    padding: 0.36rem 0.6rem;
+    font-size: 0.68rem;
+    min-width: 0;
+  }
+
+  .nav-toggle span {
+    width: 24px;
+  }
+
+  .pill-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pill-grid .pill:last-child:nth-child(odd) {
+    grid-column: auto;
+    justify-self: stretch;
+    width: 100%;
   }
 }
