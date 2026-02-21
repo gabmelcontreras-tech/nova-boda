@@ -1126,8 +1126,112 @@ h1 {
   width: 64px;
   height: 64px;
   border-radius: 14px;
-  background: #111111;
+  background-color: #f3e6e2;
+  background-image: linear-gradient(135deg, #f3e6e2, #f8dfe6);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   flex-shrink: 0;
+}
+
+.category-card-link[href*="bandas-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/bandas.png");
+}
+
+.category-card-link[href*="servicios-bar-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/Servicios de bar.png");
+}
+
+.category-card-link[href*="maquillaje-y-peluqueria-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/maquillaje y peluqueria.png");
+}
+
+.category-card-link[href*="salones-novia-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/salones de novia.png");
+}
+
+.category-card-link[href*="pasteleria-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/pasteleria.png");
+}
+
+.category-card-link[href*="catering-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/Catering.png");
+}
+
+.category-card-link[href*="clases-baile-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/clases de baile.png");
+}
+
+.category-card-link[href*="decoracion-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/decoracion.png");
+}
+
+.category-card-link[href*="dj-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/DJs.png");
+}
+
+.category-card-link[href*="ensembles-solistas-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/Ensembles y solistas.png");
+}
+
+.category-card-link[href*="recuerdos-regalos-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/recuerdosy regalos.png");
+}
+
+.category-card-link[href*="floristerias-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/floristerias.png");
+}
+
+.category-card-link[href*="bloques-habitaciones-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/Bloques de habitaciones.png");
+}
+
+.category-card-link[href*="invitaciones-papeleria-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/invitaciones.png");
+}
+
+.category-card-link[href*="joyeria-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/joyeria.png");
+}
+
+.category-card-link[href*="oficiantes-consejeria-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/oficiantes y consejeria prematrimonial.png");
+}
+
+.category-card-link[href*="fotomatones-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/Fotomatones.png");
+}
+
+.category-card-link[href*="fotografos-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/fotografos.png");
+}
+
+.category-card-link[href*="espacios-recepcion-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/espacios al aire libre.png");
+}
+
+.category-card-link[href*="cenas-ensayo-celebraciones-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/cenas de ensayo y despedidas.png");
+}
+
+.category-card-link[href*="alquileres-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/alquileres.png");
+}
+
+.category-card-link[href*="transporte-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/transporte.png");
+}
+
+.category-card-link[href*="especialistas-viajes-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/especcialistas en viajes.png");
+}
+
+.category-card-link[href*="videografos-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/videografo.png");
+}
+
+.category-card-link[href*="planificadores-de-boda-valencia"] .category-thumb {
+  background-image: url("assets/category-images/fotos nova boda/planificadores.png");
 }
 
 .category-card-link span {
