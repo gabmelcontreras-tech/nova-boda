@@ -1770,7 +1770,7 @@ h1 {
   margin-top: 2.2rem;
 }
 
-.legal-page a {
+.legal-page main a {
   color: var(--primary-dark);
   text-decoration: underline;
 }
