@@ -422,147 +422,15 @@
       <section class="section vendor-grid-section" id="proveedores">
         <div class="container">
           <div class="section-head">
-            <h2>Proveedores recomendados en Valencia</h2>
+            <h2>Proveedores en Valencia</h2>
+            <p>Profesionales reales registrados en NOVA BODA.</p>
           </div>
-          <div class="grid vendor-grid-page">
-            <article class="panel vendor-card-page">
-              <img
-                class="vendor-image"
-                src="assets/vendor-placeholder.svg"
-                alt="Fotografía de boda con luz natural"
-                loading="lazy"
-                decoding="async"
-              />
-              <div>
-                <h3>Luz &amp; Lente</h3>
-                <p class="vendor-meta">Fotografía · Valencia</p>
-                <p>
-                  Fotografía natural y elegante para capturar cada momento.
-                </p>
-              </div>
-              <a class="btn ghost" href="vendor-profile.html">Ver perfil</a>
-            </article>
-            <article class="panel vendor-card-page">
-              <img
-                class="vendor-image"
-                src="assets/vendor-placeholder.svg"
-                alt="Finca al aire libre con jardín"
-                loading="lazy"
-                decoding="async"
-              />
-              <div>
-                <h3>La Alquería</h3>
-                <p class="vendor-meta">Finca · Valencia</p>
-                <p>Espacios al aire libre para celebraciones con encanto.</p>
-              </div>
-              <a class="btn ghost" href="vendor-profile.html">Ver perfil</a>
-            </article>
-            <article class="panel vendor-card-page">
-              <img
-                class="vendor-image"
-                src="assets/vendor-placeholder.svg"
-                alt="Arreglo floral en tonos suaves"
-                loading="lazy"
-                decoding="async"
-              />
-              <div>
-                <h3>Flor de Sal</h3>
-                <p class="vendor-meta">Floristería · Valencia</p>
-                <p>Diseño floral delicado y personalizado para tu boda.</p>
-              </div>
-              <a class="btn ghost" href="vendor-profile.html">Ver perfil</a>
-            </article>
-            <article class="panel vendor-card-page">
-              <img
-                class="vendor-image"
-                src="assets/vendor-placeholder.svg"
-                alt="Cabina de DJ con luces cálidas"
-                loading="lazy"
-                decoding="async"
-              />
-              <div>
-                <h3>Ritmo Nupcial</h3>
-                <p class="vendor-meta">Música y DJ · Valencia</p>
-                <p>Música a medida para ceremonia, cóctel y fiesta.</p>
-              </div>
-              <a class="btn ghost" href="vendor-profile.html">Ver perfil</a>
-            </article>
-            <article class="panel vendor-card-page">
-              <img
-                class="vendor-image"
-                src="assets/vendor-placeholder.svg"
-                alt="Mesa de banquete con platos elegantes"
-                loading="lazy"
-                decoding="async"
-              />
-              <div>
-                <h3>Mesa Mediterránea</h3>
-                <p class="vendor-meta">Catering · Valencia</p>
-                <p>Propuestas gastronómicas frescas con sabor local.</p>
-              </div>
-              <a class="btn ghost" href="vendor-profile.html">Ver perfil</a>
-            </article>
-            <article class="panel vendor-card-page">
-              <img
-                class="vendor-image"
-                src="assets/vendor-placeholder.svg"
-                alt="Decoración de mesa con velas"
-                loading="lazy"
-                decoding="async"
-              />
-              <div>
-                <h3>Detalles &amp; Luz</h3>
-                <p class="vendor-meta">Decoración · Valencia</p>
-                <p>Ambientación cálida con estilo mediterráneo.</p>
-              </div>
-              <a class="btn ghost" href="vendor-profile.html">Ver perfil</a>
-            </article>
-            <article class="panel vendor-card-page">
-              <img
-                class="vendor-image"
-                src="assets/vendor-placeholder.svg"
-                alt="Equipo de vídeo grabando una ceremonia"
-                loading="lazy"
-                decoding="async"
-              />
-              <div>
-                <h3>Cámara Serena</h3>
-                <p class="vendor-meta">Vídeo · Valencia</p>
-                <p>Vídeo emotivo con una edición limpia y moderna.</p>
-              </div>
-              <a class="btn ghost" href="vendor-profile.html">Ver perfil</a>
-            </article>
-            <article class="panel vendor-card-page">
-              <img
-                class="vendor-image"
-                src="assets/vendor-placeholder.svg"
-                alt="Tarta de boda en mesa de postres"
-                loading="lazy"
-                decoding="async"
-              />
-              <div>
-                <h3>Dulce Velo</h3>
-                <p class="vendor-meta">Pastelería · Valencia</p>
-                <p>Tartas y postres a medida para un final perfecto.</p>
-              </div>
-              <a class="btn ghost" href="vendor-profile.html">Ver perfil</a>
-            </article>
-            <article class="panel vendor-card-page">
-              <img
-                class="vendor-image"
-                src="assets/vendor-placeholder.svg"
-                alt="Vestidos de novia en atelier"
-                loading="lazy"
-                decoding="async"
-              />
-              <div>
-                <h3>Atelier Novia</h3>
-                <p class="vendor-meta">Vestidos · Valencia</p>
-                <p>Asesoría y vestidos con ajustes a tu medida.</p>
-              </div>
-              <a class="btn ghost" href="vendor-profile.html">Ver perfil</a>
-            </article>
+          <div class="grid vendor-grid-page" id="liveVendorGrid">
+            <!-- Populated by app.js from Supabase -->
           </div>
+          <p class="vendor-grid-cta muted">
+            ¿Eres proveedor? <a href="vendors-auth.html">Crea tu perfil gratis</a> y aparece aquí.
+          </p>
         </div>
       </section>
 
@@ -713,7 +581,9 @@
       </div>
     </footer>
 
-    <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js?v=20260326a"></script>
+    <script src="app.js?v=20260326a"></script>
   </body>
 </html>
 

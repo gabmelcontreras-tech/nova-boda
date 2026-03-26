@@ -6,7 +6,8 @@ if(t)t.setAttribute("aria-expanded","false");
 
 const SESS="nova_vendor_session_v1",PROF="nova_vendor_profiles_v1";
 const isSub=location.pathname.includes("/proveedores-boda-valencia/");
-const parse=v=>{try{return JSON.parse(v);}catch{return null;}};
+const parse=v=>{try{return JSON.parse(v);}catch{return null;};};
+const escHtml=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const cfg=window.NovaBodaSupabase||{};
 const okCfg=typeof cfg.url==="string"&&typeof cfg.anonKey==="string"&&cfg.url&&cfg.anonKey&&!cfg.url.includes("REPLACE_")&&!cfg.anonKey.includes("REPLACE_");
 const sb=okCfg&&window.supabase?.createClient?window.supabase.createClient(cfg.url,cfg.anonKey):null;
@@ -83,7 +84,7 @@ async function loadByUser(userId,email=""){if(!sb||!userId)return null;
   const ps=await sb.from("vendor_packages").select("*").eq("vendor_id",userId).order("position",{ascending:true});
   const fs=await sb.from("vendor_faqs").select("*").eq("vendor_id",userId).order("position",{ascending:true});
   const b=def(p1(v.data,["contact_email","email"],email),p1(v.data,["name","business_name"],""),p1(v.data,["phone"],""));
-  const out={...b,name:String(p1(v.data,["name","business_name"],b.name)),category:String(p1(v.data,["category"],b.category)),location:String(p1(v.data,["location"],b.location)),description:String(p1(v.data,["description","short_description"],b.description)),contactEmail:String(p1(v.data,["contact_email","email"],b.contactEmail)),phone:String(p1(v.data,["phone"],b.phone)),rating:String(p1(v.data,["rating"],b.rating)),responseTime:String(p1(v.data,["response_time","response_time_text"],b.responseTime)),availability:String(p1(v.data,["availability","availability_notes"],b.availability)),slug:String(p1(v.data,["slug"],"")),verified:v.data.verified===true,plan:String(p1(v.data,["plan"],"free"))};
+  const out={...b,name:String(p1(v.data,["name","business_name"],b.name)),category:String(p1(v.data,["category"],b.category)),location:String(p1(v.data,["location"],b.location)),description:String(p1(v.data,["description","short_description"],b.description)),contactEmail:String(p1(v.data,["contact_email","email"],b.contactEmail)),phone:String(p1(v.data,["phone"],b.phone)),rating:String(p1(v.data,["rating"],b.rating)),responseTime:String(p1(v.data,["response_time","response_time_text"],b.responseTime)),availability:String(p1(v.data,["availability","availability_notes"],b.availability)),slug:String(p1(v.data,["slug"],"")),verified:v.data.verified===true,plan:String(p1(v.data,["plan"],"free")),id:String(v.data.id||""),cover_photo:String(v.data.cover_photo||""),photos:Array.isArray(v.data.photos)?v.data.photos.filter(x=>typeof x==="string"&&x):[]};
   const pk=(Array.isArray(ps.data)?ps.data:[]).map((x,i)=>normPkg(x,i+1)).filter(Boolean).slice(0,2);
   const fq=(Array.isArray(fs.data)?fs.data:[]).map(normFaq).filter(Boolean).slice(0,20);
   if(pk.length)out.packages=pk;if(fq.length)out.faqs=fq;return out;
@@ -116,6 +117,10 @@ function renderPublic(profile){if(!profile||!q("#publicVendorName"))return;
   const vForm=q("#contact .cta-form");if(vForm&&profile.contactEmail){const cc=document.createElement("input");cc.type="hidden";cc.name="_cc";cc.value=profile.contactEmail;vForm.appendChild(cc);const subj=document.createElement("input");subj.type="hidden";subj.name="_subject";subj.value=`Consulta para ${profile.name||"proveedor"} \u2014 NOVA BODA`;vForm.appendChild(subj);}
   // Verified badge
   const trust=q("#vendorVerifiedBadge");if(trust)trust.hidden=!(profile.verified===true);
+  // Cover photo
+  if(profile.cover_photo){const cWrap=q("#vendorCoverWrap");const cImg=q("#vendorCoverPhoto");if(cImg){cImg.src=profile.cover_photo;cImg.alt=profile.name||"Portada";}if(cWrap){cWrap.hidden=false;cWrap.removeAttribute("aria-hidden");}}
+  // Gallery photos
+  const gWrap=q("#publicVendorGallery");if(gWrap&&Array.isArray(profile.photos)&&profile.photos.length){gWrap.innerHTML=profile.photos.slice(0,6).map((url,i)=>`<article class="panel vendor-card-page"><img class="vendor-image" src="${escHtml(url)}" alt="Foto ${i+1}" loading="lazy" decoding="async"/></article>`).join("");}
   // GA4: profile view
   if(window.gtag)gtag("event","vendor_profile_view",{vendor_name:profile.name,vendor_category:profile.category||""});
 }
@@ -416,6 +421,50 @@ if(dash)(async()=>{
   render();
   dash.addEventListener("submit",async e=>{e.preventDefault();const p=patch();if(!p.name){if(status)status.textContent="El nombre comercial es obligatorio.";return;}let ok=false;if(s.source==="supabase"&&s.raw?.user)ok=await saveProfile(s.raw.user,p);else{upLocal(s.email,p);ok=true;}if(status)status.textContent=ok?"Guardado.":"Error al guardar.";setTimeout(()=>{if(status)status.textContent="";},2200);});
   faqForm?.addEventListener("submit",e=>{e.preventDefault();const fd=new FormData(faqForm),question=String(fd.get("question")||"").trim(),answer=String(fd.get("answer")||"").trim();if(!question||!answer){if(faqStatus)faqStatus.textContent="Completa pregunta y respuesta.";setTimeout(()=>{if(faqStatus)faqStatus.textContent="";},2200);return;}faqs=[...faqs,{question,answer}].slice(0,20);faqForm.reset();if(faqStatus)faqStatus.textContent="Anadida.";setTimeout(()=>{if(faqStatus)faqStatus.textContent="";},1600);render();});
+  // ── Photo upload ────────────────────────────────────────────────────────────
+  if(s.source==="supabase"&&s.userId&&sb){
+    const photoStatus=q("#vendorPhotoStatus"),coverInput=q("#vendorCoverInput"),photoInput=q("#vendorPhotoInput"),coverPreview=q("#vendorCoverPreview"),galleryGrid=q("#vendorGalleryGrid");
+    const renderGallery=photos=>{
+      if(!galleryGrid)return;
+      if(!photos?.length){galleryGrid.innerHTML='<p class="muted">Sin fotos de galería.</p>';return;}
+      galleryGrid.innerHTML=photos.map((url,i)=>`<div class="gallery-thumb"><img src="${escHtml(url)}" alt="Foto ${i+1}" loading="lazy"/><button type="button" class="gallery-remove" data-idx="${i}" aria-label="Eliminar">×</button></div>`).join("");
+      qa(".gallery-remove",galleryGrid).forEach(btn=>btn.addEventListener("click",async()=>{const idx=+btn.dataset.idx;const np=(profile.photos||[]).filter((_,i)=>i!==idx);const {error}=await sb.from("vendors").update({photos:np}).eq("id",s.userId);if(!error){profile.photos=np;renderGallery(np);}}));
+    };
+    if(profile.cover_photo&&coverPreview){coverPreview.src=profile.cover_photo;coverPreview.hidden=false;}
+    renderGallery(profile.photos||[]);
+    const uploadFile=async(file,path)=>{const {error}=await sb.storage.from("vendor-media").upload(path,file,{upsert:true,contentType:file.type});if(error)return null;return sb.storage.from("vendor-media").getPublicUrl(path).data?.publicUrl||null;};
+    coverInput?.addEventListener("change",async e=>{
+      const file=e.target.files?.[0];if(!file)return;
+      if(photoStatus)photoStatus.textContent="Subiendo portada...";
+      const ext=file.name.split(".").pop();
+      const url=await uploadFile(file,`${s.userId}/cover.${ext}`);
+      if(!url){if(photoStatus)photoStatus.textContent="Error al subir.";return;}
+      const {error}=await sb.from("vendors").update({cover_photo:url}).eq("id",s.userId);
+      if(!error){profile.cover_photo=url;if(coverPreview){coverPreview.src=url;coverPreview.hidden=false;}if(photoStatus)photoStatus.textContent="Portada guardada.";}
+      else if(photoStatus)photoStatus.textContent="Error al guardar.";
+      setTimeout(()=>{if(photoStatus)photoStatus.textContent="";},2400);
+    });
+    photoInput?.addEventListener("change",async e=>{
+      const files=[...(e.target.files||[])].slice(0,5);if(!files.length)return;
+      if(photoStatus)photoStatus.textContent=`Subiendo ${files.length} foto(s)...`;
+      const urls=[];
+      for(const file of files){const ext=file.name.split(".").pop();const url=await uploadFile(file,`${s.userId}/gal-${Date.now()}-${Math.random().toString(36).slice(2,7)}.${ext}`);if(url)urls.push(url);}
+      const np=[...(profile.photos||[]),...urls].slice(0,12);
+      const {error}=await sb.from("vendors").update({photos:np}).eq("id",s.userId);
+      if(!error){profile.photos=np;renderGallery(np);if(photoStatus)photoStatus.textContent=`${urls.length} foto(s) subida(s).`;}
+      else if(photoStatus)photoStatus.textContent="Error al guardar.";
+      setTimeout(()=>{if(photoStatus)photoStatus.textContent="";},2400);
+      e.target.value="";
+    });
+  }
+  // ── Dashboard analytics ───────────────────────────────────────────────────
+  const ag=q("#vendorAnalyticsGrid");
+  if(ag&&s.source==="supabase"&&s.userId&&sb){
+    const since=new Date(Date.now()-30*24*60*60*1000).toISOString();
+    const {data:evts}=await sb.from("vendor_events").select("event_type").eq("vendor_id",s.userId).gte("created_at",since);
+    const c={profile_view:0,contact_submit:0};(evts||[]).forEach(e=>{if(c[e.event_type]!=null)c[e.event_type]++;});
+    ag.innerHTML=`<div class="stat-card"><span class="stat-value">${c.profile_view}</span><span class="stat-label">Visitas al perfil (30d)</span></div><div class="stat-card"><span class="stat-value">${c.contact_submit}</span><span class="stat-label">Solicitudes recibidas (30d)</span></div>`;
+  }
 })();
 
 // ── Vendor public profile ────────────────────────────────────────────────────
@@ -427,12 +476,16 @@ if(q("#publicVendorName"))(async()=>{
   if(main)main.classList.remove("is-loading");
   if(!profile){location.replace("404.html?reason=vendor-not-found");return;}
   renderPublic(profile);
+  if(sb&&profile.id){
+    sb.from("vendor_events").insert({vendor_id:profile.id,event_type:"profile_view"}).then(()=>{});
+    const cf=q("#contact .cta-form");if(cf)cf.dataset.vendorId=profile.id;
+  }
 })();
 
 // ── Contact forms ────────────────────────────────────────────────────────────
 const ENDPOINT="https://formsubmit.co/ajax/contacto@novaboda.es";
 qa(".cta-form").forEach(f=>{const h=document.createElement("input");h.type="text";h.name="_honey";h.style.cssText="display:none;position:absolute;left:-9999px";h.tabIndex=-1;h.setAttribute("autocomplete","off");f.appendChild(h);});
-qa(".cta-form").forEach(f=>f.addEventListener("submit",async e=>{e.preventDefault();const b=q('button[type="submit"]',f);if(!b)return;const txt=b.textContent;b.textContent="Enviando...";b.disabled=true;try{const fd=new FormData(f);if(fd.get("_honey")){b.textContent=txt;b.disabled=false;return;}if(!fd.get("_subject"))fd.append("_subject","Nueva solicitud desde NOVA BODA");const r=await fetch(ENDPOINT,{method:"POST",headers:{Accept:"application/json"},body:fd});if(!r.ok)throw new Error();b.textContent="Solicitud enviada";if(window.gtag)gtag("event","contact_form_submit");f.reset();}catch{b.textContent="No se pudo enviar";}finally{setTimeout(()=>{b.textContent=txt;b.disabled=false;},2400);}}));
+qa(".cta-form").forEach(f=>f.addEventListener("submit",async e=>{e.preventDefault();const b=q('button[type="submit"]',f);if(!b)return;const txt=b.textContent;b.textContent="Enviando...";b.disabled=true;try{const fd=new FormData(f);if(fd.get("_honey")){b.textContent=txt;b.disabled=false;return;}if(!fd.get("_subject"))fd.append("_subject","Nueva solicitud desde NOVA BODA");const r=await fetch(ENDPOINT,{method:"POST",headers:{Accept:"application/json"},body:fd});if(!r.ok)throw new Error();b.textContent="Solicitud enviada";if(window.gtag)gtag("event","contact_form_submit");if(sb){const vid=f.dataset.vendorId;if(vid)sb.from("vendor_events").insert({vendor_id:vid,event_type:"contact_submit"}).then(()=>{});}f.reset();}catch{b.textContent="No se pudo enviar";}finally{setTimeout(()=>{b.textContent=txt;b.disabled=false;},2400);}}));
 
 // GA4: solicitar info clicks
 qa('a[href="#contact"].btn').forEach(btn=>btn.addEventListener("click",()=>{if(window.gtag)gtag("event","solicitar_info_click");}));
@@ -478,6 +531,29 @@ if(adminTable)(async()=>{
     const id=btn.dataset.id,newVal=btn.dataset.verified!=="true";
     const {error}=await sb.from("vendors").update({verified:newVal}).eq("id",id);
     if(!error){btn.dataset.verified=String(newVal);btn.textContent=newVal?"Desverificar":"Verificar";btn.closest("tr").querySelector(".verified-cell").textContent=newVal?"Sí":"No";}
+  });
+})();
+
+// ── Live vendor listings ──────────────────────────────────────────────────────
+const liveGrid=q("#liveVendorGrid");
+if(liveGrid&&sb)(async()=>{
+  const cat=liveGrid.dataset.category||"";
+  liveGrid.innerHTML='<div class="live-grid-loading"><span class="spinner" aria-hidden="true"></span></div>';
+  let qb=sb.from("vendors").select("id,slug,name,category,location,description,cover_photo,verified").order("verified",{ascending:false}).order("created_at",{ascending:false}).limit(24);
+  if(cat)qb=qb.ilike("category","%"+cat+"%");
+  const {data,error}=await qb;
+  if(error||!data?.length){liveGrid.innerHTML='<div class="live-grid-empty"><p class="muted">Aún no hay proveedores registrados aquí. <a href="'+(isSub?"../":"")+'vendors-auth.html">¿Eres proveedor? Crea tu perfil gratis.</a></p></div>';return;}
+  liveGrid.innerHTML="";
+  data.forEach(v=>{
+    const slug=v.slug||v.id;
+    const href=(isSub?"../":"")+"vendor-profile.html?vendor="+encodeURIComponent(slug);
+    const img=v.cover_photo?`<img class="vendor-image" src="${escHtml(v.cover_photo)}" alt="${escHtml(v.name||"")}" loading="lazy" decoding="async"/>`:'<div class="vendor-image vendor-image-placeholder" aria-hidden="true"></div>';
+    const badge=v.verified?' <span class="verified-pill">Verificado</span>':"";
+    const desc=escHtml((v.description||"").slice(0,90));
+    const art=document.createElement("article");
+    art.className="panel vendor-card-page";
+    art.innerHTML=img+'<div><h3>'+escHtml(v.name||"—")+badge+'</h3><p class="vendor-meta">'+escHtml(v.category||"—")+' · '+escHtml(v.location||"Valencia")+'</p><p>'+(desc||"Proveedor de bodas en Valencia.")+'</p></div><a class="btn ghost" href="'+href+'">Ver perfil</a>';
+    liveGrid.appendChild(art);
   });
 })();
 

@@ -283,24 +283,36 @@
 
             <article class="panel dashboard-card dashboard-card--full">
               <h2>Fotos del perfil</h2>
-              <p class="muted">
-                Próximamente podrás subir tus fotos (logo, portada y galería) para que
-                aparezcan en tu perfil público.
-              </p>
-              <div class="upload-placeholder" aria-label="Subida de fotos (próximamente)">
-                <div class="upload-icon" aria-hidden="true">⬆</div>
-                <div class="upload-copy">
-                  <strong>Arrastra y suelta imágenes aquí</strong>
-                  <span class="muted">o selecciona archivos desde tu dispositivo</span>
+              <p class="muted">Sube una portada y fotos de galería para que aparezcan en tu perfil público.</p>
+              <div class="dashboard-photos">
+                <div class="photo-upload-section">
+                  <h3 class="dashboard-subtitle">Foto de portada</h3>
+                  <div class="cover-preview-wrap">
+                    <img id="vendorCoverPreview" class="cover-preview" src="" alt="Portada actual" hidden/>
+                  </div>
+                  <label class="btn ghost upload-btn">
+                    Cambiar portada
+                    <input id="vendorCoverInput" type="file" accept="image/jpeg,image/png,image/webp" style="display:none"/>
+                  </label>
                 </div>
-                <button class="btn ghost" type="button" disabled>
-                  Seleccionar imágenes
-                </button>
+                <div class="photo-upload-section">
+                  <h3 class="dashboard-subtitle">Galería (máx. 12 fotos)</h3>
+                  <div class="gallery-grid" id="vendorGalleryGrid"></div>
+                  <label class="btn ghost upload-btn" style="margin-top:0.75rem">
+                    Añadir fotos
+                    <input id="vendorPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" multiple style="display:none"/>
+                  </label>
+                </div>
               </div>
-              <p class="dashboard-hint muted">
-                Por ahora, tu perfil público usa imágenes placeholder. Cuando activemos esta
-                función, podrás gestionar tu galería desde aquí.
-              </p>
+              <p class="muted dashboard-hint" aria-live="polite" id="vendorPhotoStatus"></p>
+            </article>
+
+            <article class="panel dashboard-card dashboard-card--full">
+              <h2>Estadísticas (últimos 30 días)</h2>
+              <p class="muted">Visitas y solicitudes de contacto recibidas en tu perfil público.</p>
+              <div class="stats-grid" id="vendorAnalyticsGrid">
+                <span class="muted">Cargando estadísticas...</span>
+              </div>
             </article>
           </div>
         </div>
@@ -333,8 +345,8 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js?v=20260219a"></script>
-    <script src="app.js?v=20260219a"></script>
+    <script src="supabase-config.js?v=20260326a"></script>
+    <script src="app.js?v=20260326a"></script>
   </body>
 </html>
 
