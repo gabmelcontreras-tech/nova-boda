@@ -1,0 +1,7 @@
+# Cloudflare Pages redirects
+
+# www → non-www (canonical)
+https://www.novaboda.com/* https://novaboda.com/:splat 301
+
+# Custom 404
+/404 /404.html 404

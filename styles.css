@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap');
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -123,7 +125,7 @@ img {
 }
 
 .hero {
-  min-height: 100vh;
+  min-height: min(100vh, 860px);
   display: flex;
   align-items: center;
   padding: 5rem 0 4rem;
@@ -197,7 +199,7 @@ h1 {
   margin: 0 auto;
   background: #ffffff;
   border: 1px solid rgba(58, 47, 42, 0.16);
-  border-radius: 0;
+  border-radius: 12px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: stretch;
@@ -257,7 +259,7 @@ h1 {
 
 .hero-search-submit {
   border: none;
-  background: #e74d63;
+  background: var(--text);
   color: #ffffff;
   font-weight: 700;
   font-size: 0.9rem;
@@ -267,7 +269,7 @@ h1 {
 }
 
 .hero-search-submit:hover {
-  background: #d94458;
+  background: #2a2118;
 }
 
 .hero-search-field:focus-within {
@@ -420,14 +422,14 @@ h1 {
 }
 
 .btn.primary {
-  background: var(--primary);
+  background: #a8415d;
   color: #fff;
   box-shadow: 0 10px 25px rgba(232, 163, 183, 0.4);
 }
 
 .btn.primary:hover {
   transform: translateY(-1px);
-  background: var(--primary-dark);
+  background: #8f3550;
   box-shadow: 0 14px 32px rgba(217, 137, 161, 0.45);
 }
 
@@ -456,6 +458,27 @@ h1 {
 
 .hero-card {
   display: none;
+}
+
+@media (min-width: 900px) {
+  .hero-content {
+    grid-template-columns: 1fr 360px;
+    text-align: left;
+  }
+  .hero-card {
+    display: block;
+  }
+  .lead {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .hero-actions {
+    justify-content: flex-start;
+  }
+  .hero-search-wrap {
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
 .card {
@@ -2169,6 +2192,18 @@ h1 {
 
   .pill-grid.category-pill-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pill-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .pill-grid .pill {
+    width: 100%;
+  }
+
+  .pill-grid .pill:nth-child(7) {
+    grid-column: auto;
   }
 
   .category-grid-list {

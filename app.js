@@ -36,13 +36,14 @@ const p1=(o,ks,d="")=>{if(!o||typeof o!=="object")return d;for(const k of ks){if
 const normItems=v=>Array.isArray(v)?v.map(x=>String(x).trim()).filter(Boolean).slice(0,10):typeof v==="string"?v.split("\n").map(x=>x.trim()).filter(Boolean).slice(0,10):[];
 const normPkg=(p,i=1)=>{const name=String(p1(p,["name","title","package_name"],"")).trim(),price=String(p1(p,["price","price_from","price_eur"],"")).trim(),currency=String(p1(p,["currency"],"EUR")||"EUR").trim(),items=normItems(p1(p,["items","includes"],[]));if(!name&&!price&&!items.length)return null;return{name:name||`Paquete ${i}`,price,currency,items};};
 const normFaq=f=>{const question=String(p1(f,["question"],"")).trim(),answer=String(p1(f,["answer"],"")).trim();return question&&answer?{question,answer}:null;};
+const genSlug=(name,uid)=>{const base=String(name||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,50)||"proveedor";return base+"-"+String(uid).slice(0,6);};
 
 async function sbSession(){if(!sb)return null;const {data,error}=await sb.auth.getSession();if(error)return null;return data?.session||null;}
 async function active(){if(sb){const s=await sbSession();if(s?.user?.email)return{source:"supabase",email:s.user.email,userId:s.user.id,raw:s};}const l=getLocalSess();return l?.email?{...l,source:"local"}:null;}
 async function signOut(){if(sb)await sb.auth.signOut();clearLocalSess();}
 
 async function ensureVendor(user,seed={}){if(!sb||!user?.id)return null;const d=def(user.email||"",seed.name||"",seed.phone||"");
-  const patch={id:user.id,email:user.email||"",contact_email:seed.contactEmail||user.email||"",name:seed.name||d.name,category:seed.category||"",location:seed.location||d.location,description:seed.description||"",phone:seed.phone||"",response_time:seed.responseTime||d.responseTime,availability:seed.availability||d.availability};
+  const patch={id:user.id,email:user.email||"",contact_email:seed.contactEmail||user.email||"",name:seed.name||d.name,category:seed.category||"",location:seed.location||d.location,description:seed.description||"",phone:seed.phone||"",response_time:seed.responseTime||d.responseTime,availability:seed.availability||d.availability,slug:genSlug(seed.name||d.name,user.id)};
   const r=await sb.from("vendors").upsert(patch,{onConflict:"id"}).select("id").maybeSingle();return r.error?null:(r.data||{id:user.id});
 }
 
@@ -51,14 +52,14 @@ async function loadByUser(userId,email=""){if(!sb||!userId)return null;
   const ps=await sb.from("vendor_packages").select("*").eq("vendor_id",userId).order("position",{ascending:true});
   const fs=await sb.from("vendor_faqs").select("*").eq("vendor_id",userId).order("position",{ascending:true});
   const b=def(p1(v.data,["contact_email","email"],email),p1(v.data,["name","business_name"],""),p1(v.data,["phone"],""));
-  const out={...b,name:String(p1(v.data,["name","business_name"],b.name)),category:String(p1(v.data,["category"],b.category)),location:String(p1(v.data,["location"],b.location)),description:String(p1(v.data,["description","short_description"],b.description)),contactEmail:String(p1(v.data,["contact_email","email"],b.contactEmail)),phone:String(p1(v.data,["phone"],b.phone)),rating:String(p1(v.data,["rating"],b.rating)),responseTime:String(p1(v.data,["response_time","response_time_text"],b.responseTime)),availability:String(p1(v.data,["availability","availability_notes"],b.availability))};
+  const out={...b,name:String(p1(v.data,["name","business_name"],b.name)),category:String(p1(v.data,["category"],b.category)),location:String(p1(v.data,["location"],b.location)),description:String(p1(v.data,["description","short_description"],b.description)),contactEmail:String(p1(v.data,["contact_email","email"],b.contactEmail)),phone:String(p1(v.data,["phone"],b.phone)),rating:String(p1(v.data,["rating"],b.rating)),responseTime:String(p1(v.data,["response_time","response_time_text"],b.responseTime)),availability:String(p1(v.data,["availability","availability_notes"],b.availability)),slug:String(p1(v.data,["slug"],""))};
   const pk=(Array.isArray(ps.data)?ps.data:[]).map((x,i)=>normPkg(x,i+1)).filter(Boolean).slice(0,2);
   const fq=(Array.isArray(fs.data)?fs.data:[]).map(normFaq).filter(Boolean).slice(0,20);
   if(pk.length)out.packages=pk;if(fq.length)out.faqs=fq;return out;
 }
 
 async function saveProfile(user,patch){if(!sb||!user?.id)return false;
-  const head={id:user.id,email:user.email||"",name:String(patch.name||"").trim(),category:String(patch.category||"").trim(),location:String(patch.location||"").trim(),description:String(patch.description||"").trim(),contact_email:String(patch.contactEmail||user.email||"").trim(),phone:String(patch.phone||"").trim(),response_time:String(patch.responseTime||"").trim(),availability:String(patch.availability||"").trim()};
+  const head={id:user.id,email:user.email||"",name:String(patch.name||"").trim(),category:String(patch.category||"").trim(),location:String(patch.location||"").trim(),description:String(patch.description||"").trim(),contact_email:String(patch.contactEmail||user.email||"").trim(),phone:String(patch.phone||"").trim(),response_time:String(patch.responseTime||"").trim(),availability:String(patch.availability||"").trim(),slug:genSlug(String(patch.name||"").trim(),user.id)};
   const v=await sb.from("vendors").upsert(head,{onConflict:"id"});if(v.error)return false;
   const pk=(Array.isArray(patch.packages)?patch.packages:[]).map((x,i)=>normPkg(x,i+1)).filter(Boolean).slice(0,2);
   const fq=(Array.isArray(patch.faqs)?patch.faqs:[]).map(normFaq).filter(Boolean).slice(0,20);
@@ -80,6 +81,8 @@ function renderPublic(profile){if(!profile||!q("#publicVendorName"))return;
   set("#publicVendorName",profile.name);set("#publicVendorLead",profile.description);set("#publicVendorCategory",profile.category);set("#publicVendorLocation",profile.location);set("#publicVendorRating",profile.rating||"—");set("#publicVendorResponseTime",profile.responseTime);set("#publicVendorAvailability",profile.availability);
   const pWrap=q("#publicVendorPackages");if(pWrap){const arr=(Array.isArray(profile.packages)?profile.packages:[]).map((x,i)=>normPkg(x,i+1)).filter(Boolean);if(arr.length){pWrap.innerHTML="";arr.forEach(p=>{const a=document.createElement("article");a.className="panel pricing-card";a.innerHTML=`<div><h3>${p.name}</h3><p class="price">${p.price?`Desde ${p.price} ${p.currency}`:`Consultar ${p.currency}`}</p></div><ul>${(p.items||[]).slice(0,8).map(i=>`<li>${i}</li>`).join("")}</ul>`;pWrap.appendChild(a);});}}
   const fWrap=q("#publicVendorFaq");if(fWrap){const arr=(Array.isArray(profile.faqs)?profile.faqs:[]).map(normFaq).filter(Boolean).slice(0,12);if(arr.length){fWrap.innerHTML="";arr.forEach(f=>{const d=document.createElement("details");d.innerHTML=`<summary>${f.question}</summary><p>${f.answer}</p>`;fWrap.appendChild(d);});}}
+  if(profile.name){const title=`${profile.name} | ${profile.category||"Proveedor"} en Valencia | NOVA BODA`;document.title=title;const desc=profile.description?profile.description.slice(0,160):`Descubre ${profile.name}, proveedor de boda en Valencia.`;const metaDesc=q('meta[name="description"]');if(metaDesc)metaDesc.setAttribute("content",desc);const ogT=q('meta[property="og:title"]');if(ogT)ogT.setAttribute("content",`${profile.name} | NOVA BODA`);const ogD=q('meta[property="og:description"]');if(ogD)ogD.setAttribute("content",desc);if(profile.slug){const can=q('link[rel="canonical"]');if(can)can.setAttribute("href",`https://novaboda.com/vendor-profile.html?vendor=${encodeURIComponent(profile.slug)}`);}}
+  const vForm=q("#contact .cta-form");if(vForm&&profile.contactEmail){const cc=document.createElement("input");cc.type="hidden";cc.name="_cc";cc.value=profile.contactEmail;vForm.appendChild(cc);const subj=document.createElement("input");subj.type="hidden";subj.name="_subject";subj.value=`Consulta para ${profile.name||"proveedor"} \u2014 NOVA BODA`;vForm.appendChild(subj);}
 }
 
 async function navState(){const a=q(".nav-login");if(!a)return;const s=await active();if(s?.email){a.textContent="Mi cuenta";a.href=isSub?"../vendor-dashboard.html":"vendor-dashboard.html";}else{a.textContent="Iniciar sesion";a.href=isSub?"../vendors-auth.html":"vendors-auth.html";}}
@@ -353,7 +356,7 @@ if(dash)(async()=>{
   q("#vendorLogoutBtn")?.addEventListener("click",async()=>{await signOut();location.href="vendors-auth.html";});
   const status=q("#vendorSaveStatus"),faqForm=q("#vendorFaqForm"),faqList=q("#vendorFaqList"),faqCount=q("#vendorFaqCount"),faqStatus=q("#vendorFaqStatus");
   let profile=null;
-  if(s.source==="supabase"&&s.userId){profile=await loadByUser(s.userId,s.email);if(!profile&&s.raw?.user){await ensureVendor(s.raw.user,{});profile=await loadByUser(s.userId,s.email);}}
+  if(s.source==="supabase"&&s.userId){profile=await loadByUser(s.userId,s.email);if(!profile&&s.raw?.user){await ensureVendor(s.raw.user,{});profile=await loadByUser(s.userId,s.email);}if(profile?.slug&&publicLink)publicLink.setAttribute("href",`vendor-profile.html?vendor=${encodeURIComponent(profile.slug)}`);}
   else profile=getLocalProfile()||def(s.email);
   if(!profile)profile=def(s.email);
   const set=(n,v)=>{const el=q(`[name="${n}"]`,dash);if(!el)return;const val=v||"";if(el.tagName==="SELECT"&&val&&!Array.from(el.options).some(o=>o.value===val)){const opt=document.createElement("option");opt.value=val;opt.textContent=`${val} (Personalizado)`;el.appendChild(opt);}el.value=val;};
@@ -378,5 +381,6 @@ if(q("#publicVendorName"))(async()=>{
 })();
 
 const ENDPOINT="https://formsubmit.co/ajax/contacto@novaboda.es";
-qa(".cta-form").forEach(f=>f.addEventListener("submit",async e=>{e.preventDefault();const b=q('button[type="submit"]',f);if(!b)return;const txt=b.textContent;b.textContent="Enviando...";b.disabled=true;try{const fd=new FormData(f);fd.append("_captcha","false");fd.append("_subject","Nueva solicitud desde NOVA BODA");const r=await fetch(ENDPOINT,{method:"POST",headers:{Accept:"application/json"},body:fd});if(!r.ok)throw new Error();b.textContent="Solicitud enviada";f.reset();}catch{b.textContent="No se pudo enviar";}finally{setTimeout(()=>{b.textContent=txt;b.disabled=false;},2400);}}));
+qa(".cta-form").forEach(f=>{const h=document.createElement("input");h.type="text";h.name="_honey";h.style.cssText="display:none;position:absolute;left:-9999px";h.tabIndex=-1;h.setAttribute("autocomplete","off");f.appendChild(h);});
+qa(".cta-form").forEach(f=>f.addEventListener("submit",async e=>{e.preventDefault();const b=q('button[type="submit"]',f);if(!b)return;const txt=b.textContent;b.textContent="Enviando...";b.disabled=true;try{const fd=new FormData(f);if(fd.get("_honey")){b.textContent=txt;b.disabled=false;return;}if(!fd.get("_subject"))fd.append("_subject","Nueva solicitud desde NOVA BODA");const r=await fetch(ENDPOINT,{method:"POST",headers:{Accept:"application/json"},body:fd});if(!r.ok)throw new Error();b.textContent="Solicitud enviada";f.reset();}catch{b.textContent="No se pudo enviar";}finally{setTimeout(()=>{b.textContent=txt;b.disabled=false;},2400);}}));
 navState();
