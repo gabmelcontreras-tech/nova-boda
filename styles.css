@@ -132,6 +132,14 @@ img {
   background: var(--bg);
 }
 
+@media (max-width: 899px) {
+  .hero {
+    min-height: auto;
+    padding: 3.5rem 0 3rem;
+    align-items: flex-start;
+  }
+}
+
 .hero .container {
   width: min(900px, 90vw);
 }
@@ -1415,7 +1423,7 @@ h1 {
 }
 
 .category-card-link[href*="bloques-habitaciones-boda-valencia"] .category-thumb {
-  background-image: url("assets/category-images/fotos nova boda/bloques de habitaciones.png");
+  background-image: url("assets/category-images/fotos nova boda/Bloques de habitaciones.png");
 }
 
 .category-card-link[href*="invitaciones-papeleria-boda-valencia"] .category-thumb {
