@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon-heart.svg?v=20260221" />
+    <title>Admin | NOVA BODA</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="stylesheet" href="styles.css?v=20260326" />
+    <style>
+      .admin-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+      .admin-table th, .admin-table td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid rgba(58,47,42,0.1); }
+      .admin-table th { font-weight: 600; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+      .admin-table tbody tr:hover { background: rgba(168,65,93,0.04); }
+      .admin-table-wrap { overflow-x: auto; }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="logo" href="index.html">
+          <img class="logo-image" src="assets/Nova Design 2000 transparente.png" alt="NOVA BODA" />
+        </a>
+        <div class="nav-right">
+          <nav class="nav-links">
+            <a href="vendor-dashboard.html">Panel</a>
+          </nav>
+          <a class="btn primary nav-login" href="vendors-auth.html">Iniciar sesión</a>
+        </div>
+        <button class="nav-toggle" aria-label="Alternar navegación">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="container" id="adminContent">
+          <div class="section-head">
+            <h1>Panel de administración</h1>
+            <p class="lead">Gestión de proveedores NOVA BODA.</p>
+          </div>
+          <article class="panel">
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Plan</th>
+                    <th>Verificado</th>
+                    <th>Registro</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="adminVendorList"></tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-content">
+        <div>
+          <a class="footer-home" href="index.html" aria-label="Ir al inicio">
+            <img class="logo-image footer-logo" src="assets/Nova Design 2000 transparente white font footer.png" alt="NOVA BODA" />
+          </a>
+          <small>© 2026 NOVA BODA. Todos los derechos reservados.</small>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js?v=20260219a"></script>
+    <script src="app.js?v=20260326"></script>
+  </body>
+</html>

@@ -11,6 +11,37 @@ const cfg=window.NovaBodaSupabase||{};
 const okCfg=typeof cfg.url==="string"&&typeof cfg.anonKey==="string"&&cfg.url&&cfg.anonKey&&!cfg.url.includes("REPLACE_")&&!cfg.anonKey.includes("REPLACE_");
 const sb=okCfg&&window.supabase?.createClient?window.supabase.createClient(cfg.url,cfg.anonKey):null;
 
+// ── Analytics & Consent ──────────────────────────────────────────────────────
+const GA_ID="G-XXXXXXXXXX"; // TODO: replace with real Measurement ID
+const CONSENT_KEY="nova_cookie_consent";
+function loadGA4(){
+  if(window.__ga4Loaded)return;window.__ga4Loaded=true;
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}window.gtag=gtag;
+  gtag("js",new Date());gtag("config",GA_ID);
+  const s=document.createElement("script");s.async=true;
+  s.src="https://www.googletagmanager.com/gtag/js?id="+GA_ID;
+  document.head.appendChild(s);
+}
+function getConsent(){return localStorage.getItem(CONSENT_KEY);}
+function initCookieBanner(){
+  if(getConsent()){if(getConsent()==="accepted")loadGA4();return;}
+  const banner=document.createElement("div");banner.id="nova-cookie-banner";
+  banner.setAttribute("role","dialog");banner.setAttribute("aria-label","Aviso de cookies");
+  banner.innerHTML='<p>Usamos cookies analíticas para mejorar tu experiencia. Consulta nuestra <a href="cookies.html">política de cookies</a>.</p><div class="cookie-banner-actions"><button id="nova-cookie-accept" class="btn primary">Aceptar</button><button id="nova-cookie-decline" class="btn ghost">Rechazar</button></div>';
+  document.body.appendChild(banner);
+  document.getElementById("nova-cookie-accept").addEventListener("click",()=>{localStorage.setItem(CONSENT_KEY,"accepted");banner.remove();loadGA4();});
+  document.getElementById("nova-cookie-decline").addEventListener("click",()=>{localStorage.setItem(CONSENT_KEY,"declined");banner.remove();});
+}
+
+// ── Stripe ───────────────────────────────────────────────────────────────────
+const STRIPE_LINK_BASIC="https://buy.stripe.com/PLACEHOLDER_BASIC"; // TODO: replace with real Payment Link
+const STRIPE_LINK_PRO="https://buy.stripe.com/PLACEHOLDER_PRO";     // TODO: replace with real Payment Link
+function stripeUrl(base,email){try{const u=new URL(base);if(email)u.searchParams.set("prefilled_email",email);return u.toString();}catch{return base;}}
+
+// ── Admin ────────────────────────────────────────────────────────────────────
+const ADMIN_EMAILS=["admin@novaboda.es"]; // TODO: add real admin email(s)
+
 const getLocalSess=()=>parse(localStorage.getItem(SESS));
 const setLocalSess=s=>localStorage.setItem(SESS,JSON.stringify(s));
 const clearLocalSess=()=>localStorage.removeItem(SESS);
@@ -52,7 +83,7 @@ async function loadByUser(userId,email=""){if(!sb||!userId)return null;
   const ps=await sb.from("vendor_packages").select("*").eq("vendor_id",userId).order("position",{ascending:true});
   const fs=await sb.from("vendor_faqs").select("*").eq("vendor_id",userId).order("position",{ascending:true});
   const b=def(p1(v.data,["contact_email","email"],email),p1(v.data,["name","business_name"],""),p1(v.data,["phone"],""));
-  const out={...b,name:String(p1(v.data,["name","business_name"],b.name)),category:String(p1(v.data,["category"],b.category)),location:String(p1(v.data,["location"],b.location)),description:String(p1(v.data,["description","short_description"],b.description)),contactEmail:String(p1(v.data,["contact_email","email"],b.contactEmail)),phone:String(p1(v.data,["phone"],b.phone)),rating:String(p1(v.data,["rating"],b.rating)),responseTime:String(p1(v.data,["response_time","response_time_text"],b.responseTime)),availability:String(p1(v.data,["availability","availability_notes"],b.availability)),slug:String(p1(v.data,["slug"],""))};
+  const out={...b,name:String(p1(v.data,["name","business_name"],b.name)),category:String(p1(v.data,["category"],b.category)),location:String(p1(v.data,["location"],b.location)),description:String(p1(v.data,["description","short_description"],b.description)),contactEmail:String(p1(v.data,["contact_email","email"],b.contactEmail)),phone:String(p1(v.data,["phone"],b.phone)),rating:String(p1(v.data,["rating"],b.rating)),responseTime:String(p1(v.data,["response_time","response_time_text"],b.responseTime)),availability:String(p1(v.data,["availability","availability_notes"],b.availability)),slug:String(p1(v.data,["slug"],"")),verified:v.data.verified===true,plan:String(p1(v.data,["plan"],"free"))};
   const pk=(Array.isArray(ps.data)?ps.data:[]).map((x,i)=>normPkg(x,i+1)).filter(Boolean).slice(0,2);
   const fq=(Array.isArray(fs.data)?fs.data:[]).map(normFaq).filter(Boolean).slice(0,20);
   if(pk.length)out.packages=pk;if(fq.length)out.faqs=fq;return out;
@@ -83,6 +114,10 @@ function renderPublic(profile){if(!profile||!q("#publicVendorName"))return;
   const fWrap=q("#publicVendorFaq");if(fWrap){const arr=(Array.isArray(profile.faqs)?profile.faqs:[]).map(normFaq).filter(Boolean).slice(0,12);if(arr.length){fWrap.innerHTML="";arr.forEach(f=>{const d=document.createElement("details");d.innerHTML=`<summary>${f.question}</summary><p>${f.answer}</p>`;fWrap.appendChild(d);});}}
   if(profile.name){const title=`${profile.name} | ${profile.category||"Proveedor"} en Valencia | NOVA BODA`;document.title=title;const desc=profile.description?profile.description.slice(0,160):`Descubre ${profile.name}, proveedor de boda en Valencia.`;const metaDesc=q('meta[name="description"]');if(metaDesc)metaDesc.setAttribute("content",desc);const ogT=q('meta[property="og:title"]');if(ogT)ogT.setAttribute("content",`${profile.name} | NOVA BODA`);const ogD=q('meta[property="og:description"]');if(ogD)ogD.setAttribute("content",desc);if(profile.slug){const can=q('link[rel="canonical"]');if(can)can.setAttribute("href",`https://novaboda.com/vendor-profile.html?vendor=${encodeURIComponent(profile.slug)}`);}}
   const vForm=q("#contact .cta-form");if(vForm&&profile.contactEmail){const cc=document.createElement("input");cc.type="hidden";cc.name="_cc";cc.value=profile.contactEmail;vForm.appendChild(cc);const subj=document.createElement("input");subj.type="hidden";subj.name="_subject";subj.value=`Consulta para ${profile.name||"proveedor"} \u2014 NOVA BODA`;vForm.appendChild(subj);}
+  // Verified badge
+  const trust=q("#vendorVerifiedBadge");if(trust)trust.hidden=!(profile.verified===true);
+  // GA4: profile view
+  if(window.gtag)gtag("event","vendor_profile_view",{vendor_name:profile.name,vendor_category:profile.category||""});
 }
 
 async function navState(){const a=q(".nav-login");if(!a)return;const s=await active();if(s?.email){a.textContent="Mi cuenta";a.href=isSub?"../vendor-dashboard.html":"vendor-dashboard.html";}else{a.textContent="Iniciar sesion";a.href=isSub?"../vendors-auth.html":"vendors-auth.html";}}
@@ -249,6 +284,7 @@ if(heroSearch){
     e.preventDefault();
     const query=(heroQuery?.value||"").trim();
     const where=(heroWhere?.value||"").trim();
+    if(window.gtag)gtag("event","search_submit",{search_term:query});
     const direct=routeFromQuery(query);
     if(direct){location.href=direct;return;}
     const p=new URLSearchParams();
@@ -334,6 +370,7 @@ if(signup){
       if(r.data?.user)await ensureVendor(r.data.user,{name:nm,phone:ph,contactEmail:em});
       if(!r.data?.session){if(err){err.textContent="Cuenta creada. Revisa tu correo para confirmar y luego inicia sesion.";err.hidden=false;}showTab("login");return;}
     }else{upLocal(em,{...def(em,nm,ph),name:nm,phone:ph,contactEmail:em});setLocalSess({email:em,loggedInAt:Date.now()});}
+    if(window.gtag)gtag("event","vendor_signup");
     location.href="vendor-dashboard.html";
   });
   pass2?.addEventListener("input",()=>{if(pass2.validity.customError)pass2.setCustomValidity("");});
@@ -342,6 +379,12 @@ if(signup){
 const dash=q("#vendorProfileForm");
 if(dash)(async()=>{
   const s=await active();if(!s?.email){location.href="vendors-auth.html";return;}
+  // plan=success banner after Stripe redirect
+  if(location.search.includes("plan=success")){
+    const msg=document.createElement("div");msg.className="panel dashboard-card";
+    msg.innerHTML="<h2>Pago recibido</h2><p>Tu plan se ha activado. Puede tardar unos minutos en reflejarse en tu perfil.</p>";
+    q(".dashboard-grid")?.prepend(msg);history.replaceState({},"","vendor-dashboard.html");
+  }
   const emailEl=q("#vendorSessionEmail");if(emailEl)emailEl.textContent=s.email;
   {
     const publicLink=q("#vendorPublicProfileLink");
@@ -356,9 +399,11 @@ if(dash)(async()=>{
   q("#vendorLogoutBtn")?.addEventListener("click",async()=>{await signOut();location.href="vendors-auth.html";});
   const status=q("#vendorSaveStatus"),faqForm=q("#vendorFaqForm"),faqList=q("#vendorFaqList"),faqCount=q("#vendorFaqCount"),faqStatus=q("#vendorFaqStatus");
   let profile=null;
-  if(s.source==="supabase"&&s.userId){profile=await loadByUser(s.userId,s.email);if(!profile&&s.raw?.user){await ensureVendor(s.raw.user,{});profile=await loadByUser(s.userId,s.email);}if(profile?.slug&&publicLink)publicLink.setAttribute("href",`vendor-profile.html?vendor=${encodeURIComponent(profile.slug)}`);}
+  if(s.source==="supabase"&&s.userId){profile=await loadByUser(s.userId,s.email);if(!profile&&s.raw?.user){await ensureVendor(s.raw.user,{});profile=await loadByUser(s.userId,s.email);}if(profile?.slug&&q("#vendorPublicProfileLink"))q("#vendorPublicProfileLink").setAttribute("href",`vendor-profile.html?vendor=${encodeURIComponent(profile.slug)}`);}
   else profile=getLocalProfile()||def(s.email);
   if(!profile)profile=def(s.email);
+  // Show current plan badge
+  if(profile.plan&&profile.plan!=="free"){const planEl=q("#vendorCurrentPlan");if(planEl)planEl.textContent=`Plan: ${profile.plan}`;}
   const set=(n,v)=>{const el=q(`[name="${n}"]`,dash);if(!el)return;const val=v||"";if(el.tagName==="SELECT"&&val&&!Array.from(el.options).some(o=>o.value===val)){const opt=document.createElement("option");opt.value=val;opt.textContent=`${val} (Personalizado)`;el.appendChild(opt);}el.value=val;};
   set("name",profile.name);set("category",profile.category);set("location",profile.location);set("description",profile.description);set("contactEmail",profile.contactEmail||s.email);set("phone",profile.phone);set("responseTime",profile.responseTime);set("availability",profile.availability);
   const pk=Array.isArray(profile.packages)?profile.packages:[],toLines=i=>Array.isArray(i)?i.filter(Boolean).join("\n"):"";
@@ -373,14 +418,68 @@ if(dash)(async()=>{
   faqForm?.addEventListener("submit",e=>{e.preventDefault();const fd=new FormData(faqForm),question=String(fd.get("question")||"").trim(),answer=String(fd.get("answer")||"").trim();if(!question||!answer){if(faqStatus)faqStatus.textContent="Completa pregunta y respuesta.";setTimeout(()=>{if(faqStatus)faqStatus.textContent="";},2200);return;}faqs=[...faqs,{question,answer}].slice(0,20);faqForm.reset();if(faqStatus)faqStatus.textContent="Anadida.";setTimeout(()=>{if(faqStatus)faqStatus.textContent="";},1600);render();});
 })();
 
+// ── Vendor public profile ────────────────────────────────────────────────────
 if(q("#publicVendorName"))(async()=>{
+  const main=q("main");if(main)main.classList.add("is-loading");
   const vendor=new URLSearchParams(location.search).get("vendor");
   let profile=vendor?await loadPublic(vendor):null;
   if(!profile){const s=await active();if(s?.source==="supabase"&&s.userId)profile=await loadByUser(s.userId,s.email);else if(s?.email)profile=getLocalProfile();}
+  if(main)main.classList.remove("is-loading");
+  if(!profile){location.replace("404.html?reason=vendor-not-found");return;}
   renderPublic(profile);
 })();
 
+// ── Contact forms ────────────────────────────────────────────────────────────
 const ENDPOINT="https://formsubmit.co/ajax/contacto@novaboda.es";
 qa(".cta-form").forEach(f=>{const h=document.createElement("input");h.type="text";h.name="_honey";h.style.cssText="display:none;position:absolute;left:-9999px";h.tabIndex=-1;h.setAttribute("autocomplete","off");f.appendChild(h);});
-qa(".cta-form").forEach(f=>f.addEventListener("submit",async e=>{e.preventDefault();const b=q('button[type="submit"]',f);if(!b)return;const txt=b.textContent;b.textContent="Enviando...";b.disabled=true;try{const fd=new FormData(f);if(fd.get("_honey")){b.textContent=txt;b.disabled=false;return;}if(!fd.get("_subject"))fd.append("_subject","Nueva solicitud desde NOVA BODA");const r=await fetch(ENDPOINT,{method:"POST",headers:{Accept:"application/json"},body:fd});if(!r.ok)throw new Error();b.textContent="Solicitud enviada";f.reset();}catch{b.textContent="No se pudo enviar";}finally{setTimeout(()=>{b.textContent=txt;b.disabled=false;},2400);}}));
+qa(".cta-form").forEach(f=>f.addEventListener("submit",async e=>{e.preventDefault();const b=q('button[type="submit"]',f);if(!b)return;const txt=b.textContent;b.textContent="Enviando...";b.disabled=true;try{const fd=new FormData(f);if(fd.get("_honey")){b.textContent=txt;b.disabled=false;return;}if(!fd.get("_subject"))fd.append("_subject","Nueva solicitud desde NOVA BODA");const r=await fetch(ENDPOINT,{method:"POST",headers:{Accept:"application/json"},body:fd});if(!r.ok)throw new Error();b.textContent="Solicitud enviada";if(window.gtag)gtag("event","contact_form_submit");f.reset();}catch{b.textContent="No se pudo enviar";}finally{setTimeout(()=>{b.textContent=txt;b.disabled=false;},2400);}}));
+
+// GA4: solicitar info clicks
+qa('a[href="#contact"].btn').forEach(btn=>btn.addEventListener("click",()=>{if(window.gtag)gtag("event","solicitar_info_click");}));
+
+// ── Planes: Stripe payment links ─────────────────────────────────────────────
+if(q("#pricing")){
+  (async()=>{
+    const s=await active();
+    const email=s?.email||"";
+    const vendorCard=q('#pricing .pricing-grid article:nth-child(2)');
+    if(vendorCard){
+      const btn=vendorCard.querySelector(".btn");
+      if(btn){
+        btn.href=stripeUrl(STRIPE_LINK_BASIC,email);
+        btn.textContent="Contratar plan";
+        btn.classList.add("btn","primary");
+        btn.classList.remove("ghost");
+        btn.addEventListener("click",()=>{if(window.gtag)gtag("event","plan_cta_click",{plan:"basic"});});
+      }
+    }
+  })();
+}
+
+// ── Admin panel ──────────────────────────────────────────────────────────────
+const adminTable=q("#adminVendorList");
+if(adminTable)(async()=>{
+  const s=await active();
+  const adminContent=q("#adminContent");
+  if(!s?.email||!ADMIN_EMAILS.includes(s.email)){
+    if(adminContent)adminContent.innerHTML='<p class="lead">Acceso restringido. Solo administradores pueden ver esta página.</p>';
+    return;
+  }
+  if(!sb){if(adminContent)adminContent.innerHTML='<p class="lead">Supabase no está configurado.</p>';return;}
+  const {data:vendors,error}=await sb.from("vendors").select("id,name,category,plan,verified,created_at").order("created_at",{ascending:false});
+  if(error||!vendors){if(adminContent)adminContent.innerHTML='<p class="lead">Error al cargar proveedores.</p>';return;}
+  vendors.forEach(v=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${v.name||"—"}</td><td>${v.category||"—"}</td><td>${v.plan||"free"}</td><td class="verified-cell">${v.verified?"Sí":"No"}</td><td>${v.created_at?v.created_at.slice(0,10):"—"}</td><td><button class="btn ghost" data-id="${v.id}" data-verified="${v.verified}">${v.verified?"Desverificar":"Verificar"}</button></td>`;
+    adminTable.appendChild(tr);
+  });
+  adminTable.addEventListener("click",async e=>{
+    const btn=e.target.closest("button[data-id]");if(!btn)return;
+    const id=btn.dataset.id,newVal=btn.dataset.verified!=="true";
+    const {error}=await sb.from("vendors").update({verified:newVal}).eq("id",id);
+    if(!error){btn.dataset.verified=String(newVal);btn.textContent=newVal?"Desverificar":"Verificar";btn.closest("tr").querySelector(".verified-cell").textContent=newVal?"Sí":"No";}
+  });
+})();
+
 navState();
+initCookieBanner();

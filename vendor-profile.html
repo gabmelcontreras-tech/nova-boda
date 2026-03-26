@@ -95,9 +95,7 @@
       }
     </script>
     <link rel="stylesheet" href="styles.css?v=20260221f" />
-    <!-- Google Analytics — replace G-XXXXXXXXXX with your Measurement ID -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-XXXXXXXXXX");</script>
+    <!-- GA4 loaded conditionally via app.js after cookie consent -->
   </head>
   <body>
     <header class="site-header">
@@ -126,7 +124,10 @@
       </div>
     </header>
 
-    <main>
+    <main class="is-loading">
+      <div id="vendorProfileLoader" class="profile-loader" role="status" aria-label="Cargando proveedor">
+        <span class="spinner" aria-hidden="true"></span>
+      </div>
       <section class="section seo-hero">
         <div class="container seo-hero-content">
           <div>
@@ -267,7 +268,7 @@
         </div>
       </section>
 
-      <section class="section trust-strip">
+      <section id="vendorVerifiedBadge" class="section trust-strip" hidden>
         <div class="container">
           <div class="trust-content">
             <h2>Proveedor verificado en NOVA BODA</h2>

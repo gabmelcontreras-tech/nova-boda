@@ -2694,3 +2694,63 @@ h1 {
     width: 100%;
   }
 }
+
+/* ── Cookie consent banner ───────────────────────────────────────────────── */
+#nova-cookie-banner {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background: var(--card);
+  border: 1px solid rgba(168, 65, 93, 0.25);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  max-width: 560px;
+  width: calc(100vw - 2rem);
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+}
+#nova-cookie-banner a {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+.cookie-banner-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+.cookie-banner-actions .btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* ── Vendor profile loading state ────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spinner {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(168, 65, 93, 0.2);
+  border-top-color: #a8415d;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.profile-loader {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+main.is-loading .profile-loader {
+  display: flex;
+}
+main.is-loading > section {
+  display: none;
+}
