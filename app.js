@@ -1,8 +1,18 @@
 const q=(s,r=document)=>r.querySelector(s),qa=(s,r=document)=>[...r.querySelectorAll(s)];
 const t=q(".nav-toggle"),n=q(".nav-links");
-t?.addEventListener("click",()=>{n?.classList.toggle("open");if(t&&n)t.setAttribute("aria-expanded",String(n.classList.contains("open")));});
-qa(".nav-links a").forEach(a=>a.addEventListener("click",()=>{n?.classList.remove("open");t?.setAttribute("aria-expanded","false");}));
+// Backdrop overlay for mobile nav
+let backdrop=null;
+function closeNav(){n?.classList.remove("open");t?.setAttribute("aria-expanded","false");backdrop?.classList.remove("open");}
+function openNav(){n?.classList.add("open");t?.setAttribute("aria-expanded","true");backdrop?.classList.add("open");}
+if(t&&n){
+  backdrop=document.createElement("div");backdrop.className="nav-backdrop";document.body.appendChild(backdrop);
+  backdrop.addEventListener("click",closeNav);
+  t.addEventListener("click",()=>{n.classList.contains("open")?closeNav():openNav();});
+}
+qa(".nav-links a").forEach(a=>a.addEventListener("click",closeNav));
 if(t)t.setAttribute("aria-expanded","false");
+// Active nav link
+(()=>{const path=location.pathname.replace(/\/$/,"");qa(".nav-links a").forEach(a=>{const href=new URL(a.href,location.origin).pathname.replace(/\/$/,"");if(href===path||(href!=="/index.html"&&href!=="/"&&path.startsWith(href)))a.setAttribute("aria-current","page");});})();
 
 const SESS="nova_vendor_session_v1",PROF="nova_vendor_profiles_v1";
 const isSub=location.pathname.includes("/proveedores-boda-valencia/");

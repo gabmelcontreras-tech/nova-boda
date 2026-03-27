@@ -109,6 +109,17 @@ img {
   font-weight: 500;
 }
 
+.nav-links a:hover {
+  color: var(--primary-dark);
+}
+
+.nav-links a[aria-current="page"],
+.nav-links a.is-active {
+  color: var(--primary-dark);
+  border-bottom: 2px solid var(--primary-dark);
+  padding-bottom: 2px;
+}
+
 .nav-toggle {
   display: none;
   flex-direction: column;
@@ -2149,16 +2160,66 @@ h1 {
     border-radius: 12px;
     box-shadow: var(--shadow);
     width: min(92vw, 360px);
-    display: none;
+    display: flex;
     z-index: 20;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
   }
 
   .nav-links.open {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
   }
 
   .nav-toggle {
     display: flex;
+    padding: 8px;
+    margin: -8px;
+  }
+
+  /* Hamburger → X animation */
+  .nav-toggle span {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    transform-origin: center;
+  }
+  .nav-toggle[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  .nav-toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  .nav-toggle[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  /* Backdrop overlay */
+  .nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+    background: transparent;
+    cursor: default;
+    pointer-events: none;
+  }
+  .nav-backdrop.open {
+    pointer-events: auto;
+  }
+
+  .nav-links a[aria-current="page"],
+  .nav-links a.is-active {
+    border-bottom: none;
+    padding-bottom: 0;
+    background: var(--accent);
+    border-radius: 8px;
+    padding: 0.4rem 0.75rem;
+    margin: -0.4rem -0.75rem;
   }
 }
 
@@ -2829,6 +2890,14 @@ main.is-loading > .vendor-cover-figure {
   height: 420px;
   object-fit: cover;
   display: block;
+}
+@media (max-width: 640px) {
+  .vendor-cover-figure {
+    max-height: 220px;
+  }
+  .vendor-cover-photo {
+    height: 220px;
+  }
 }
 
 /* ── Photo upload (dashboard) ────────────────────────────────────────────── */
