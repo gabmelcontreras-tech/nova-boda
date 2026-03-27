@@ -2120,6 +2120,10 @@ h1 {
   flex-wrap: wrap;
 }
 
+.footer-links a {
+  font-size: 0.8rem;
+}
+
 @media (max-width: 840px) {
   .nav {
     position: relative;
