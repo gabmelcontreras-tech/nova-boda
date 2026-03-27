@@ -3008,7 +3008,18 @@ main.is-loading > .vendor-cover-figure {
 }
 
 /* ── Dark mode ─────────────────────────────────────────────────────────────── */
-[data-theme="dark"],
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1e1512;
+  --text: #f0e4de;
+  --muted: #a08880;
+  --primary: #c47a94;
+  --primary-dark: #e8a3b7;
+  --accent: #3a2030;
+  --card: #2a1e1a;
+  --shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
