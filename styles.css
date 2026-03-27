@@ -216,7 +216,7 @@ h1 {
 .hero-search {
   width: min(880px, 100%);
   margin: 0 auto;
-  background: #ffffff;
+  background: var(--card);
   border: 1px solid rgba(58, 47, 42, 0.16);
   border-radius: 12px;
   display: grid;
@@ -238,7 +238,7 @@ h1 {
   align-items: center;
   gap: 0.75rem;
   padding: 0.7rem 0.9rem;
-  background: #ffffff;
+  background: var(--card);
   position: relative;
   border-radius: 0;
 }
@@ -307,7 +307,7 @@ h1 {
   left: 0;
   top: calc(100% + 8px);
   width: 100%;
-  background: #ffffff;
+  background: var(--card);
   border: 1px solid rgba(58, 47, 42, 0.18);
   box-shadow: 0 18px 34px rgba(58, 47, 42, 0.16);
   z-index: 30;
@@ -564,7 +564,7 @@ h1 {
 }
 
 .section#services .panel {
-  background: #ffffff;
+  background: var(--card);
   border-radius: 18px;
   border: 1px solid rgba(120, 98, 90, 0.12);
   box-shadow: 0 18px 40px rgba(58, 47, 42, 0.08);
@@ -699,7 +699,7 @@ h1 {
 }
 
 .vendor-rating {
-  background: #fff;
+  background: var(--card);
   border-radius: 999px;
   padding: 0.35rem 0.8rem;
   border: 1px solid rgba(120, 98, 90, 0.12);
@@ -809,7 +809,7 @@ h1 {
 }
 
 .faq details {
-  background: #fff;
+  background: var(--card);
   border-radius: 16px;
   border: 1px solid rgba(120, 98, 90, 0.12);
   padding: 1.2rem 1.4rem;
@@ -898,7 +898,7 @@ h1 {
 .category-card {
   border-radius: 22px;
   padding: 22px;
-  background: #ffffff;
+  background: var(--card);
   border: 1px solid rgba(120, 98, 90, 0.1);
   box-shadow: 0 18px 40px rgba(58, 47, 42, 0.08);
   display: flex;
@@ -909,7 +909,7 @@ h1 {
 }
 
 .vendor-categories .category-card {
-  background: #ffffff !important;
+  background: var(--card) !important;
 }
 
 .category-card img {
@@ -1000,7 +1000,7 @@ h1 {
   border-radius: 12px;
   border: 1px solid rgba(58, 47, 42, 0.18);
   font-size: 1rem;
-  background: #ffffff;
+  background: var(--card);
   color: var(--text);
 }
 
@@ -1040,7 +1040,7 @@ h1 {
 }
 
 .auth-card {
-  background: #ffffff;
+  background: var(--card);
   border-radius: 18px;
   box-shadow: var(--shadow);
   padding: 2rem;
@@ -1071,7 +1071,7 @@ h1 {
 }
 
 .auth-tab.is-active {
-  background: #ffffff;
+  background: var(--card);
   box-shadow: 0 10px 20px rgba(58, 47, 42, 0.08);
   color: var(--text);
 }
@@ -1145,7 +1145,7 @@ h1 {
 .auth-google-btn {
   width: 100%;
   border: 1.5px solid rgba(58, 47, 42, 0.2);
-  background: #ffffff;
+  background: var(--card);
   color: var(--text);
   font-weight: 600;
   font-size: 0.95rem;
@@ -1236,7 +1236,7 @@ h1 {
   border: 1px solid rgba(58, 47, 42, 0.12);
   border-radius: 14px;
   padding: 12px 14px;
-  background: #fff;
+  background: var(--card);
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -1323,7 +1323,7 @@ h1 {
   border-radius: 12px;
   border: 1px solid rgba(58, 47, 42, 0.18);
   font-size: 1rem;
-  background: #ffffff;
+  background: var(--card);
   color: var(--text);
 }
 
@@ -1363,7 +1363,7 @@ h1 {
   align-items: center;
   gap: 14px;
   padding: 16px;
-  background: #ffffff;
+  background: var(--card);
   border-radius: 18px;
   border: 1px solid rgba(120, 98, 90, 0.12);
   box-shadow: 0 12px 28px rgba(58, 47, 42, 0.08);
@@ -1523,7 +1523,7 @@ h1 {
 }
 
 .guide-card {
-  background: #ffffff;
+  background: var(--card);
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 20px;
   box-shadow: 0 18px 36px rgba(58, 47, 42, 0.08);
@@ -1577,7 +1577,7 @@ h1 {
 }
 
 .category-reading-card {
-  background: #ffffff;
+  background: var(--card);
   border-radius: var(--radius);
   border: 1px solid rgba(120, 98, 90, 0.12);
   box-shadow: 0 12px 30px rgba(58, 47, 42, 0.08);
@@ -1664,7 +1664,7 @@ h1 {
 }
 
 .help-card {
-  background: #ffffff;
+  background: var(--card);
   border-radius: var(--radius);
   border: 1px solid rgba(120, 98, 90, 0.12);
   box-shadow: 0 18px 36px rgba(58, 47, 42, 0.08);
@@ -1974,7 +1974,7 @@ h1 {
 
 .legal-page main .container {
   width: min(820px, 92vw);
-  background: #fff;
+  background: var(--card);
   border: 1px solid rgba(120, 98, 90, 0.14);
   border-radius: 18px;
   box-shadow: var(--shadow);
@@ -2347,7 +2347,7 @@ h1 {
     border: 1px solid rgba(58, 47, 42, 0.18);
     border-radius: 12px;
     min-height: 52px;
-    background: #fff;
+    background: var(--card);
     padding: 0.65rem 0.85rem;
   }
 
@@ -2435,7 +2435,7 @@ h1 {
     padding: 0.68rem 0.75rem;
     border: 1px solid rgba(58, 47, 42, 0.18);
     border-radius: 12px;
-    background: #fff;
+    background: var(--card);
   }
 
   .hero-search-sheet-search input {
