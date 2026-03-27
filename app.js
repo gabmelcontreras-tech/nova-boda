@@ -1,3 +1,5 @@
+// Apply theme early to avoid flash
+(()=>{const s=localStorage.getItem("nova_theme"),sys=window.matchMedia("(prefers-color-scheme: dark)").matches;if(s==="dark"||(s===null&&sys))document.documentElement.setAttribute("data-theme","dark");else if(s==="light")document.documentElement.setAttribute("data-theme","light");})();
 const q=(s,r=document)=>r.querySelector(s),qa=(s,r=document)=>[...r.querySelectorAll(s)];
 const t=q(".nav-toggle"),n=q(".nav-links");
 // Backdrop overlay for mobile nav
@@ -13,6 +15,27 @@ qa(".nav-links a").forEach(a=>a.addEventListener("click",closeNav));
 if(t)t.setAttribute("aria-expanded","false");
 // Active nav link
 (()=>{const path=location.pathname.replace(/\/$/,"");qa(".nav-links a").forEach(a=>{const href=new URL(a.href,location.origin).pathname.replace(/\/$/,"");if(href===path||(href!=="/index.html"&&href!=="/"&&path.startsWith(href)))a.setAttribute("aria-current","page");});})();
+// Dark mode toggle
+(()=>{
+  const DARK_KEY="nova_theme";
+  const html=document.documentElement;
+  const saved=localStorage.getItem(DARK_KEY);
+  const sysDark=window.matchMedia("(prefers-color-scheme: dark)").matches;
+  if(saved==="dark"||(saved===null&&sysDark))html.setAttribute("data-theme","dark");
+  else if(saved==="light")html.setAttribute("data-theme","light");
+  const moonSvg='<svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>';
+  const sunSvg='<svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+  const btn=document.createElement("button");
+  btn.className="theme-toggle";btn.setAttribute("aria-label","Cambiar tema");
+  btn.innerHTML=moonSvg+sunSvg;
+  const navRight=q(".nav-right");
+  if(navRight){const login=q(".nav-login",navRight);navRight.insertBefore(btn,login||null);}
+  btn.addEventListener("click",()=>{
+    const isDark=html.getAttribute("data-theme")==="dark";
+    html.setAttribute("data-theme",isDark?"light":"dark");
+    localStorage.setItem(DARK_KEY,isDark?"light":"dark");
+  });
+})();
 
 const SESS="nova_vendor_session_v1",PROF="nova_vendor_profiles_v1";
 const isSub=location.pathname.includes("/proveedores-boda-valencia/");

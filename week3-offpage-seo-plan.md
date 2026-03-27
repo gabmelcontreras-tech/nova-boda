@@ -1,4 +1,4 @@
-# Week 3 Off-Page SEO Plan (NOVA BODA)
+1# Week 3 Off-Page SEO Plan (NOVA BODA)
 
 ## Goal
 Increase authority for Valencia wedding queries through local signals, backlinks, and review growth.

@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"C:\\\\Users\\\\gabme\\\\.claude\\\\projects\\\\c--Users-gabme-Desktop-NOVA-Boda\\\\memory\"\" 2>/dev/null && cat \"C:Usersgabme.claudeprojectsc--Users-gabme-Desktop-NOVA-BodamemoryMEMORY.md\" 2>/dev/null || echo \"NO MEMORY DIR \")",
+      "Bash(npm install:*)",
+      "Bash(npx @playwright/mcp --version)",
+      "Bash(npx playwright:*)",
+      "Read(//c/Users/gabme/.claude/**)",
+      "Read(//c/Users/gabme/.config/claude/**)",
+      "Read(//c/Users/gabme/AppData/Roaming/Claude/**)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_evaluate",
+      "mcp__playwright__browser_run_code",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_network_requests",
+      "mcp__playwright__browser_resize",
+      "Bash(for f:*)",
+      "Bash(do sed:*)",
+      "Bash(done)",
+      "Bash(grep -l 'name=\"\"\"\"robots\"\"\"\"' *.html)"
+    ]
+  }
+}
