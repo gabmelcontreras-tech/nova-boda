@@ -480,7 +480,7 @@ h1 {
     margin-left: 0;
     margin-right: 0;
   }
-  .hero-actions {
+  .hero-content .hero-actions {
     justify-content: flex-start;
   }
   .hero-search-wrap {
